@@ -86,7 +86,7 @@ class AnalizadorLexico(object):
 					return MENOR_IGUAL if self.valor == "<=" else DISTINTO if self.valor == "<>" else MENOR
 				if c == ">":
 					self._obtener_mayoridad(index)
-					return MAYOR_IGUAL if self.valor == ">" else MAYOR
+					return MAYOR_IGUAL if self.valor == ">=" else MAYOR
 				
 				if c in ESPECIALES:
 					self.valor = c
