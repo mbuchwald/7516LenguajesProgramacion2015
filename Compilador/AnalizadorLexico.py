@@ -2,26 +2,26 @@ ANULADOS = [" ", "\t"]
 QUIEBRE = ["#", "\n"]
 VACIO = ""
 
-ERROR_LEXICO = -1
-IDENTIFICADOR_O_RESERVADA = 0
-NUMERO = 1
-ASIGNACION = 2
-MENOR = 3
-MAYOR = 4
-IGUAL = 5
-MENOR_IGUAL = 6
-MAYOR_IGUAL = 7
-DISTINTO = 8
-PUNTO = 9
-MAS = 10
-MENOS = 11
-MULTIPLICAR = 12
-PUNTO_Y_COMA = 13
-COMA = 14
-DIVIDIR = 15
-ABRIR_PARENTESIS = 16
-CERRAR_PARENTESIS = 17
-EOF = 18
+ERROR_LEXICO = "ERROR"
+IDENTIFICADOR_O_RESERVADA = "ID/RESERVADA"
+NUMERO = "NUMERO"
+ASIGNACION = "ASIGNACION"
+MENOR = "MENOR"
+MAYOR = "MAYOR"
+IGUAL = "IGUAL"
+MENOR_IGUAL = "MENOR IGUAL"
+MAYOR_IGUAL = "MAYOR IGUAL"
+DISTINTO = "DISTINTO"
+PUNTO = "PUNTO"
+MAS = "MAS"
+MENOS = "MENOS"
+MULTIPLICAR = "MULTIPLICAR"
+PUNTO_Y_COMA = "PUNTO Y COMA"
+COMA = "COMA"
+DIVIDIR = "DIVIDIR"
+ABRIR_PARENTESIS = "ABRIR"
+CERRAR_PARENTESIS = "CERRAR"
+EOF = "EOF"
 ESPECIALES = {"+": MAS, "-": MENOS, "*": MULTIPLICAR, "/": DIVIDIR, ".": PUNTO, ",": COMA, ";": PUNTO_Y_COMA, "=": IGUAL, "(": ABRIR_PARENTESIS, ")": CERRAR_PARENTESIS }	
 	
 	
@@ -116,7 +116,7 @@ class AnalizadorLexico(object):
 		formado = ""
 		for i in range(index, len(self.linea_actual)):
 			c = self.linea_actual[i]
-			if c in ANULADOS or c in QUIEBRE or (numero and not c.isdigit()): break
+			if c in ANULADOS or c in QUIEBRE or (numero and not c.isdigit()) or (not c.isdigit() and not c.isalpha()): break
 			formado += c
 			index += 1
 		self.valor = formado

@@ -52,6 +52,7 @@ class AnalizadorSintactico(object):
 				if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
 					identificador = self.scanner.obtener_valor_actual()
 					#TODO: definir identificador como variable, analizador que no sea reservada ni constante ni variable, etc...
+					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
 						simbolo = self.scanner.obtener_simbolo()
 						break
