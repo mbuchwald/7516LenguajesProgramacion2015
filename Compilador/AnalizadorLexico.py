@@ -90,9 +90,6 @@ class AnalizadorLexico(object):
 				
 				if c == "<":
 					self._obtener_menoridad(index)
-					if self.valor == "<=":
-						self.tipo = 
-					
 					self.tipo = MENOR_IGUAL if self.valor == "<=" else DISTINTO if self.valor == "<>" else MENOR
 					return self.tipo
 					

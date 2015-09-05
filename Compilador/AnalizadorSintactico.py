@@ -56,6 +56,6 @@ class AnalizadorSintactico(object):
 if __name__ == "__main__":
 	output = open("salida.txt", "w")
 	al = AnalizadorLexico.AnalizadorLexico("ejemplo.txt", output)
-	as = AnalizadorSintactico(al, output)
-	as.parsear_programa()
+	an_sintac = AnalizadorSintactico(al, output)
+	an_sintac.parsear_programa()
 	output.close()
