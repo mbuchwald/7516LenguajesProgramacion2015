@@ -80,6 +80,10 @@ class AnalizadorSintactico(object):
 				continue
 			simbolo = self.scanner.obtener_simbolo()
 			
+		self._parsear_proposicion()
+			
+	def _parsear_proposicion(self):
+		pass
 	
 	def parsear_programa(self):
 		self._parsear_bloque()
