@@ -153,10 +153,7 @@ class AnalizadorLexico(object):
 	def _obtener_asignacion(self, index):
 		self._obtener_combinaciones(index, ":", ["="])
 		if self.valor != ":=": self.valor = None
-	
-	def terminar(self):
-		self.out.close()
-		
+			
 if __name__=="__main__":
 	output = open("salida.txt", "w")
 	al = AnalizadorLexico("ejemplo.txt", output)

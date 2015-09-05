@@ -30,26 +30,27 @@ class AnalizadorSintactico(object):
 							
 							simbolo = self.scanner.obtener_simbolo()
 							if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
+								self.scanner.obtener_simbolo()
 								break
-							elif simbolo != AnalizadorSintactico.COMA:
-								output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante")
+							elif simbolo != AnalizadorLexico.COMA:
+								output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
 								break
 						else:
-							output.write("Error Sintactico: asignacion de constante a un valor no numerico")
+							output.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
 							break
 					else:
-						output.write("Error Sintactico: asignacion de constante esperada (=)")
+						output.write("Error Sintactico: asignacion de constante esperada (=)\n")
 						break
 				else:
-					output.write("Error Sintactico: declaracion de constante no seguida de un identificador")
+					output.write("Error Sintactico: declaracion de constante no seguida de un identificador\n")
 					break
-				
+		
 	
 	def parsear_programa(self):
 		self._parsear_bloque()
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo != AnalizadorLexico.PUNTO:
-			output.write("Error Sintactico: Se esperaba punto (.) de finalizacion de programa")
+			output.write("Error Sintactico: Se esperaba punto (.) de finalizacion de programa\n")
 		
 
 
