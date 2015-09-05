@@ -1,9 +1,8 @@
-OUT_DEFAULT = "program_log.mb"
 ANULADOS = [" ", "\t"]
 QUIEBRE = ["#", "\n"]
 VACIO = ""
 
-ERROR = -1,
+ERROR_LEXICO = -1
 IDENTIFICADOR_O_RESERVADA = 0
 NUMERO = 1
 ASIGNACION = 2
@@ -28,13 +27,10 @@ ESPECIALES = {"+": MAS, "-": MENOS, "*": MULTIPLICAR, "/": DIVIDIR, ".": PUNTO, 
 	
 class AnalizadorLexico(object):
 	
-	def __init__(self, program_path, output_path = OUT_DEFAULT):
+	def __init__(self, program_path, output):
 		self._leer_archivo(program_path)
-		try:
-			self.out = open(output_path, "w")
-		except IOError:
-			raise IOError("No se pudo crear el archivo de salida del analizador lexico")
-		
+		self.out = output
+	
 		self.num_linea = 0
 		self.quedan_lineas = True
 		self._leer_linea()
@@ -79,7 +75,11 @@ class AnalizadorLexico(object):
 				
 				if c == ":":
 					self._obtener_asignacion(index)
-					return ASIGNACION if self.valor != None else ERROR
+					if self.valor != None:
+						return ASIGNACION
+					else:
+						self.out.write("Error Lexico: Dos puntos (:) sin ser asignacion (:=)\n")
+						return ERROR_LEXICO
 				
 				if c == "<":
 					self._obtener_menoridad(index)
@@ -93,7 +93,9 @@ class AnalizadorLexico(object):
 					self.linea_actual = self.linea_actual[index + 1:]
 					return ESPECIALES[c]
 				
-				return ERROR
+				self.out.write("Error Lexico: Caracter no reconocido: " + c + "\n")
+				self.linea_actual = self.linea_actual[index + 1:]
+				return ERROR_LEXICO
 						
 			self._leer_linea()
 		return EOF
@@ -144,9 +146,11 @@ class AnalizadorLexico(object):
 		self.out.close()
 		
 if __name__=="__main__":
-	al = AnalizadorLexico("ejemplo.txt")
+	output = open("salida.txt", "w")
+	al = AnalizadorLexico("ejemplo.txt", output)
 	while True:
 		c = al.obtener_simbolo()
 		if c == EOF: break
 		print c
 	al.terminar()
+	output.close()
