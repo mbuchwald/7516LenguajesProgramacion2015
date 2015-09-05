@@ -35,6 +35,7 @@ class AnalizadorLexico(object):
 		self.quedan_lineas = True
 		self._leer_linea()
 		self.valor = None
+		self.tipo = None
 	
 	def _leer_archivo(self, program_path):
 		self.lineas = []
@@ -58,6 +59,9 @@ class AnalizadorLexico(object):
 	
 	def obtener_valor_actual(self):
 		return self.valor
+		
+	def obtener_tipo_actual(self):
+		return self.tipo
 	
 	def obtener_simbolo(self):
 		while self.quedan_lineas:
@@ -67,34 +71,45 @@ class AnalizadorLexico(object):
 				
 				if c.isalpha():
 					self._obtener_id_o_reservada(index)
+					self.tipo = IDENTIFICADOR_O_RESERVADA
 					return IDENTIFICADOR_O_RESERVADA
 				
 				if c.isdigit():
 					self._obtener_numero(index)
+					self.tipo = NUMERO
 					return NUMERO
 				
 				if c == ":":
 					self._obtener_asignacion(index)
 					if self.valor != None:
-						return ASIGNACION
+						self.tipo = ASIGNACION
 					else:
 						self.out.write("Error Lexico: Dos puntos (:) sin ser asignacion (:=)\n")
-						return ERROR_LEXICO
+						self.tipo = ERROR_LEXICO
+					return self.tipo
 				
 				if c == "<":
 					self._obtener_menoridad(index)
-					return MENOR_IGUAL if self.valor == "<=" else DISTINTO if self.valor == "<>" else MENOR
+					if self.valor == "<=":
+						self.tipo = 
+					
+					self.tipo = MENOR_IGUAL if self.valor == "<=" else DISTINTO if self.valor == "<>" else MENOR
+					return self.tipo
+					
 				if c == ">":
 					self._obtener_mayoridad(index)
-					return MAYOR_IGUAL if self.valor == ">=" else MAYOR
+					self.tipo = MAYOR_IGUAL if self.valor == ">=" else MAYOR
+					return self.tipo
 				
 				if c in ESPECIALES:
 					self.valor = c
 					self.linea_actual = self.linea_actual[index + 1:]
-					return ESPECIALES[c]
+					self.tipo = ESPECIALES[c]
+					return self.tipo
 				
 				self.out.write("Error Lexico: Caracter no reconocido: " + c + "\n")
 				self.linea_actual = self.linea_actual[index + 1:]
+				self.tipo = ERROR_LEXICO
 				return ERROR_LEXICO
 						
 			self._leer_linea()
