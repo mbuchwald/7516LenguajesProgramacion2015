@@ -10,6 +10,7 @@ BEGIN = "begin"
 THEN = "then"
 DO = "do"
 ODD = "odd"
+END = "end"
 
 class AnalizadorSintactico(object):
 	
@@ -90,103 +91,108 @@ class AnalizadorSintactico(object):
 		self._parsear_proposicion()
 			
 	def _parsear_proposicion(self):
-		simbolo = self.parser.obtener_tipo_actual()
+		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
 			return
-		valor = self.parser.obtener_valor_actual()
+		
+		valor = self.scanner.obtener_valor_actual()
+		if valor == END:
+			return
+		
 		if valor == CALL:
-			simbolo = self.parser.obtener_tipo_actual()
-			identificador = self.parser.obtener_valor_actual()
+			simbolo = self.scanner.obtener_tipo_actual()
+			identificador = self.scanner.obtener_valor_actual()
 			#Validar que el identificador sea de un procedimiento
 		elif valor == IF:
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
-			simbolo = self.parser.obtener_tipo_actual()
-			if simbolo == IDENTIFICADOR_O_RESERVADA and self.parser.obtener_valor_actual() == THEN:
-				simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_tipo_actual()
+			if simbolo == IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual() == THEN:
+				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
-				self.output.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'")
+				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'")
 		elif valor == WHILE:
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
-			simbolo = self.parser.obtener_tipo_actual()
-			if simbolo == IDENTIFICADOR_O_RESERVADA and self.parser.obtener_valor_actual() == DO:
-				simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_tipo_actual()
+			if simbolo == IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual() == DO:
+				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
-				self.output.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'")
+				self.out.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'")
 		elif valor == BEGIN:
 			while True:
-				simbolo = self.parser.obtener_simbolo()
+				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
-				simbolo = self.parser.obtener_tipo_actual()
-				if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.parser.obtener_valor_actual() == END:
+				simbolo = self.scanner.obtener_tipo_actual()
+				if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual() == END:
+					simbolo = self.scanner.obtener_simbolo()
 					break
 				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
-					self.output.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin")
+					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin")
 					break
 		else:
 			#TODO Validar identificador como variable
-			simbolo = self.parser.obtener_simbolo()
-			if simbolo != ASIGNACION:
-				self.output.write("Error Sintactico: Esperada asignacion luego de variable\n")
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo != AnalizadorLexico.ASIGNACION:
+				self.out.write("Error Sintactico: Esperada asignacion luego de variable\n")
 				return
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_expresion()
 		
 	def _parsear_condicion(self):
-		simbolo = self.parser.obtener_tipo_actual()
+		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == ODD:
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_expresion()
 		else:
 			self._parsear_expresion()
-			simbolo = self.parser.obtener_tipo_actual()
+			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.IGUAL or simbolo == AnalizadorLexico.MAYOR or simbolo == AnalizadorLexico.MAYOR_IGUAL or simbolo == AnalizadorLexico.MENOR or simbolo == AnalizadorLexico.MENOR_IGUAL or simbolo == AnalizadorLexico.DISTINTO:
-				simbolo = self.parser.obtener_simbolo()
+				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_expresion()
 			else:
-				self.output.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion")
+				self.out.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion")
 					
 	def _parsear_expresion(self):
-		simbolo = self.parser.obtener_tipo_actual()
-		if simbolo == AnalizadorLexico.MAS or if simbolo == AnalizadorLexico.MENOS:
-			simbolo = self.parser.obtener_simbolo()
+		simbolo = self.scanner.obtener_tipo_actual()
+		if simbolo == AnalizadorLexico.MAS or simbolo == AnalizadorLexico.MENOS:
+			simbolo = self.scanner.obtener_simbolo()
 		while True:
 			self._parsear_termino()
-			simbolo = self.parser.obtener_tipo_actual()
-			if simbolo == AnalizadorLexico.MAS or if simbolo == AnalizadorLexico.MENOS:
-				simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_tipo_actual()
+			if simbolo == AnalizadorLexico.MAS or simbolo == AnalizadorLexico.MENOS:
+				simbolo = self.scanner.obtener_simbolo()
 			else:
 				return
 				
 	def _parsear_termino(self):
 		while True:
 			self._parsear_factor()
-			simbolo = self.parser.obtener_tipo_actual()
+			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.MULTIPLICAR or simbolo == AnalizadorLexico.DIVIDIR:
-				simbolo = self.parser.obtener_simbolo()
+				simbolo = self.scanner.obtener_simbolo()
 			else:
 				return
 				
 	def _parsear_factor(self):
-		simbolo = self.parser.obtener_tipo_actual()
+		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.NUMERO:
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
 			#Validar que sea constante o variable
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
-			simbolo = self.parser.obtener_simbolo()
+			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_expresion()
-			simbolo = self.parser.obtener_tipo_actual()
+			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.CERRAR_PARENTESIS:
-				simbolo = self.parser.obtener_simbolo()
+				simbolo = self.scanner.obtener_simbolo()
 			else:
-				self.output.write("Error Sintactico: Cierre de parentesis faltante")
+				self.out.write("Error Sintactico: Cierre de parentesis faltante")
 		else:
-			self.output.write("Error Sintactico: Identificador no esperado")
+			self.out.write("Error Sintactico: Identificador no esperado")
 				
 			
 	def parsear_programa(self):
