@@ -86,7 +86,7 @@ class AnalizadorSintactico(object):
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
 				output.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
 				continue
-			simbolo = self.scanner.obtener_simbolo()
+			#simbolo = self.scanner.obtener_simbolo()
 			
 		self._parsear_proposicion()
 			
@@ -205,7 +205,7 @@ class AnalizadorSintactico(object):
 
 if __name__ == "__main__":
 	output = open("salida.txt", "w")
-	al = AnalizadorLexico.AnalizadorLexico("ejemplo.txt", output)
+	al = AnalizadorLexico.AnalizadorLexico("Archivos/BIEN-00.PL0", output)
 	an_sintac = AnalizadorSintactico(al, output)
 	an_sintac.parsear_programa()
 	output.close()
