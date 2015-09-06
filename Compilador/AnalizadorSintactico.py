@@ -111,7 +111,7 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
-				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'")
+				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
 		elif valor == WHILE:
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
@@ -120,7 +120,7 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
-				self.out.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'")
+				self.out.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'\n")
 		elif valor == BEGIN:
 			while True:
 				simbolo = self.scanner.obtener_simbolo()
@@ -130,7 +130,7 @@ class AnalizadorSintactico(object):
 					simbolo = self.scanner.obtener_simbolo()
 					break
 				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
-					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin")
+					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin\n")
 					break
 		else:
 			#TODO Validar identificador como variable
