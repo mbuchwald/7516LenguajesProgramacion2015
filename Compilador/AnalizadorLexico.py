@@ -156,10 +156,11 @@ class AnalizadorLexico(object):
 			
 if __name__=="__main__":
 	output = open("salida.txt", "w")
-	al = AnalizadorLexico("ejemplo.txt", output)
+	import sys
+	ruta = sys.argv[1] if len(sys.argv) > 1 else "ejemplo.txt"
+	al = AnalizadorLexico(ruta, output)
 	while True:
 		c = al.obtener_simbolo()
 		if c == EOF: break
 		print c
-	al.terminar()
 	output.close()
