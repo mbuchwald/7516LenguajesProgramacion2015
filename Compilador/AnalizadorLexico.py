@@ -1,6 +1,7 @@
 ANULADOS = [" ", "\t"]
 QUIEBRE = ["#", "\n"]
 VACIO = ""
+COMILLAS = "'"
 
 ERROR_LEXICO = "ERROR"
 IDENTIFICADOR_O_RESERVADA = "ID/RESERVADA"
@@ -22,6 +23,7 @@ DIVIDIR = "DIVIDIR"
 ABRIR_PARENTESIS = "ABRIR"
 CERRAR_PARENTESIS = "CERRAR"
 EOF = "EOF"
+CADENA = "CADENA"
 ESPECIALES = {"+": MAS, "-": MENOS, "*": MULTIPLICAR, "/": DIVIDIR, ".": PUNTO, ",": COMA, ";": PUNTO_Y_COMA, "=": IGUAL, "(": ABRIR_PARENTESIS, ")": CERRAR_PARENTESIS }	
 	
 	
@@ -104,6 +106,15 @@ class AnalizadorLexico(object):
 					self.tipo = ESPECIALES[c]
 					return self.tipo
 				
+				if c == COMILLAS:
+					self._obtener_cadena(index)
+					if self.valor is None:
+						self.out.write("Error Lexico: Cadena no finalizada antes que finalice el archivo\n")
+						self.tipo = ERROR_LEXICO
+					else:
+						self.tipo = CADENA
+					return self.tipo
+				
 				self.out.write("Error Lexico: Caracter no reconocido: " + c + "\n")
 				self.linea_actual = self.linea_actual[index + 1:]
 				self.tipo = ERROR_LEXICO
@@ -121,6 +132,22 @@ class AnalizadorLexico(object):
 			index += 1
 		self.valor = formado
 		self.linea_actual = self.linea_actual[index:]
+		
+	def _obtener_cadena(self, index):
+		formado = ""
+		index += 1
+		while self.quedan_lineas:
+			for i in range(index, len(self.linea_actual)):
+				c = self.linea_actual[i]
+				if c == COMILLAS:
+					self.valor = formado
+					self.linea_actual = self.linea_actual[i+1:]
+					return
+				formado += c
+			self._leer_linea()
+			index = 0
+		self.valor = None
+				
 		
 	def _obtener_id_o_reservada(self, index):
 		self._obtener_completo(index, numero=False)
