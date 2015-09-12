@@ -11,6 +11,9 @@ THEN = "then"
 DO = "do"
 ODD = "odd"
 END = "end"
+WRITE = "write"
+WRITELN = "writeln"
+READLN = "readln"
 
 class AnalizadorSintactico(object):
 	
@@ -70,7 +73,7 @@ class AnalizadorSintactico(object):
 				else:
 					output.write("Error Sintactico: declaracion de variable no seguida de un identificador\n")
 					break
-							
+		
 		while simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual() == PROCEDURE:
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
@@ -86,8 +89,8 @@ class AnalizadorSintactico(object):
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
 				output.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
 				continue
-			#simbolo = self.scanner.obtener_simbolo()
-			
+			simbolo = self.scanner.obtener_simbolo()
+		
 		self._parsear_proposicion()
 			
 	def _parsear_proposicion(self):
@@ -100,9 +103,10 @@ class AnalizadorSintactico(object):
 			return
 		
 		if valor == CALL:
-			simbolo = self.scanner.obtener_tipo_actual()
+			simbolo = self.scanner.obtener_simbolo()
 			identificador = self.scanner.obtener_valor_actual()
 			#Validar que el identificador sea de un procedimiento
+			simbolo = self.scanner.obtener_simbolo()
 		elif valor == IF:
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
@@ -132,6 +136,51 @@ class AnalizadorSintactico(object):
 				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
 					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin\n")
 					break
+		elif valor == WRITE or valor == WRITELN:
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
+				self.out.write("Error Sintactico: Se esperaba un parentesis luego de write \n")
+				return
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo == AnalizadorLexico.CADENA:
+				#hacemos algo con esto
+				valor = self.scanner.obtener_valor_actual()
+				simbolo = self.scanner.obtener_simbolo()
+			else:
+				self._parsear_expresion()
+				
+			while self.scanner.obtener_tipo_actual() == AnalizadorLexico.COMA:
+				simbolo = self.scanner.obtener_simbolo()
+				if simbolo == AnalizadorLexico.CADENA:
+					#hacemos algo con esto
+					valor = self.scanner.obtener_valor_actual()
+					simbolo = self.scanner.obtener_simbolo()
+				else:
+					self._parsear_expresion()
+				
+			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.CERRAR_PARENTESIS:
+				self.out.write("Error Sintactico: Se esperaba un cierre de parentesis luego de write \n")
+			simbolo = self.scanner.obtener_simbolo()	
+			
+		elif valor == READLN:
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
+				self.out.write("Error Sintactico: Se esperaba un parentesis luego de readln \n")
+				return
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+				self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
+				return
+			simbolo = self.scanner.obtener_simbolo()
+			while simbolo == AnalizadorLexico.COMA:
+				simbolo = self.scanner.obtener_simbolo()
+				if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+					self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
+					return
+				simbolo = self.scanner.obtener_simbolo()
+			if simbolo != AnalizadorLexico.CERRAR_PARENTESIS:
+				self.out.write("Error Sintactico: Se esperaba cierre de parentesis luego de readln \n")
+			simbolo = self.scanner.obtener_simbolo()
 		else:
 			#TODO Validar identificador como variable
 			simbolo = self.scanner.obtener_simbolo()
@@ -205,7 +254,7 @@ class AnalizadorSintactico(object):
 
 if __name__ == "__main__":
 	output = open("salida.txt", "w")
-	al = AnalizadorLexico.AnalizadorLexico("ejemplo.txt", output)
+	al = AnalizadorLexico.AnalizadorLexico("Archivos/BIEN-00.PL0", output)
 	an_sintac = AnalizadorSintactico(al, output)
 	an_sintac.parsear_programa()
 	output.close()
