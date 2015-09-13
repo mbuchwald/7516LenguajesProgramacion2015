@@ -1,3 +1,4 @@
+import sys
 import AnalizadorLexico
 
 CONST = "const"
@@ -256,7 +257,11 @@ class AnalizadorSintactico(object):
 
 if __name__ == "__main__":
 	output = open("salida.txt", "w")
-	al = AnalizadorLexico.AnalizadorLexico("Archivos/BIEN-02.PL0", output)
+	ruta = "Archivos/BIEN-09.PL0"
+	if len(sys.argv) > 1:
+		ruta = sys.argv[1]
+	
+	al = AnalizadorLexico.AnalizadorLexico(ruta, output)
 	an_sintac = AnalizadorSintactico(al, output)
 	an_sintac.parsear_programa()
 	output.close()
