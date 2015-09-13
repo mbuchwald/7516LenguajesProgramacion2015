@@ -3,8 +3,11 @@ QUIEBRE = ["#", "\n"]
 VACIO = ""
 COMILLAS = "'"
 
+PALABRAS_RESERVADAS = ["if", "const", "var", "procedure", "call", "if", "while", "begin", "then", "do", "odd", "end", "write", "writeln", "readln"]
+
 ERROR_LEXICO = "ERROR"
-IDENTIFICADOR_O_RESERVADA = "ID/RESERVADA"
+IDENTIFICADOR = "IDENTIFICADOR"
+RESERVADA = "RESERVADA"
 NUMERO = "NUMERO"
 ASIGNACION = "ASIGNACION"
 MENOR = "MENOR"
@@ -73,8 +76,8 @@ class AnalizadorLexico(object):
 				
 				if c.isalpha():
 					self._obtener_id_o_reservada(index)
-					self.tipo = IDENTIFICADOR_O_RESERVADA
-					return IDENTIFICADOR_O_RESERVADA
+					self.tipo = RESERVADA if self.valor.lower() in PALABRAS_RESERVADAS else IDENTIFICADOR
+					return self.tipo
 				
 				if c.isdigit():
 					self._obtener_numero(index)

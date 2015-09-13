@@ -26,10 +26,10 @@ class AnalizadorSintactico(object):
 		simbolo = self.scanner.obtener_simbolo()
 		valor = self.scanner.obtener_valor_actual()
 		#Analizamos la parte de constantes:
-		if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and valor.lower() == CONST:
+		if simbolo == AnalizadorLexico.RESERVADA and valor.lower() == CONST:
 			while True:
 				simbolo = self.scanner.obtener_simbolo()
-				if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
 					#TODO: mandar al analizador semantico para ver que sea correcto el identificador!
 				
@@ -58,10 +58,10 @@ class AnalizadorSintactico(object):
 					break
 					
 		valor = self.scanner.obtener_valor_actual()
-		if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and valor.lower() == VAR:
+		if simbolo == AnalizadorLexico.RESERVADA and valor.lower() == VAR:
 			while True:
 				simbolo = self.scanner.obtener_simbolo()
-				if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
 					#TODO: definir identificador como variable, analizador que no sea reservada ni constante ni variable, etc...
 					simbolo = self.scanner.obtener_simbolo()
@@ -75,9 +75,9 @@ class AnalizadorSintactico(object):
 					output.write("Error Sintactico: declaracion de variable no seguida de un identificador\n")
 					break
 		
-		while simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual().lower() == PROCEDURE:
+		while simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == PROCEDURE:
 			simbolo = self.scanner.obtener_simbolo()
-			if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				output.write("Error Sintactico: declaracion de procedimiento no seguida de un identificador\n")
 				continue
 			identificador = self.scanner.obtener_valor_actual()
@@ -96,7 +96,7 @@ class AnalizadorSintactico(object):
 			
 	def _parsear_proposicion(self):
 		simbolo = self.scanner.obtener_tipo_actual()
-		if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+		if simbolo != AnalizadorLexico.IDENTIFICADOR and simbolo != AnalizadorLexico.RESERVADA:
 			return
 		
 		valor = self.scanner.obtener_valor_actual()
@@ -112,7 +112,7 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
 			simbolo = self.scanner.obtener_tipo_actual()
-			if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN:
+			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN:
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
@@ -121,7 +121,7 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
 			simbolo = self.scanner.obtener_tipo_actual()
-			if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
+			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
@@ -131,7 +131,7 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 				simbolo = self.scanner.obtener_tipo_actual()
-				if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual().lower() == END:
+				if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == END:
 					simbolo = self.scanner.obtener_simbolo()
 					break
 				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
@@ -170,13 +170,13 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba un parentesis luego de readln \n")
 				return
 			simbolo = self.scanner.obtener_simbolo()
-			if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
 				return
 			simbolo = self.scanner.obtener_simbolo()
 			while simbolo == AnalizadorLexico.COMA:
 				simbolo = self.scanner.obtener_simbolo()
-				if simbolo != AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+				if simbolo != AnalizadorLexico.IDENTIFICADOR:
 					self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
 					return
 				simbolo = self.scanner.obtener_simbolo()
@@ -184,6 +184,9 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba cierre de parentesis luego de readln \n")
 			simbolo = self.scanner.obtener_simbolo()
 		else:
+			if simbolo != AnalizadorLexico.IDENTIFICADOR:
+				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + simbolo + "\n")
+				return
 			#TODO Validar identificador como variable
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ASIGNACION:
@@ -232,7 +235,7 @@ class AnalizadorSintactico(object):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.NUMERO:
 			simbolo = self.scanner.obtener_simbolo()
-		elif simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA:
+		elif simbolo == AnalizadorLexico.IDENTIFICADOR:
 			#Validar que sea constante o variable
 			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
