@@ -120,7 +120,7 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
 			simbolo = self.scanner.obtener_tipo_actual()
-			if simbolo == IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
+			if simbolo == AnalizadorLexico.IDENTIFICADOR_O_RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_proposicion()
 			else:
@@ -193,7 +193,8 @@ class AnalizadorSintactico(object):
 		
 	def _parsear_condicion(self):
 		simbolo = self.scanner.obtener_tipo_actual()
-		if simbolo == ODD:
+		valor = self.scanner.obtener_valor_actual()
+		if valor == ODD:
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_expresion()
 		else:
@@ -255,7 +256,7 @@ class AnalizadorSintactico(object):
 
 if __name__ == "__main__":
 	output = open("salida.txt", "w")
-	al = AnalizadorLexico.AnalizadorLexico("Archivos/BIEN-00.PL0", output)
+	al = AnalizadorLexico.AnalizadorLexico("Archivos/BIEN-02.PL0", output)
 	an_sintac = AnalizadorSintactico(al, output)
 	an_sintac.parsear_programa()
 	output.close()
