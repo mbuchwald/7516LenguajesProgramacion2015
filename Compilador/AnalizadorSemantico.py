@@ -19,17 +19,20 @@ class AnalizadorSemantico(object):
 		return False
 	
 	def agregar_identificador(self, base, desplazamiento, nombre, tipo, valor=None):
+		if len(self.tabla) < base + desplazamiento:
+			raise ValueError("Base + desplazamiento fuera de rango")
 		if self._identificador_existente(nombre, base, desplazamiento):
 			raise ValueError("Identificador en uso en este ambiente")
-		if len(self.tabla) < desplazamiento:
+						
+		if len(self.tabla) == base + desplazamiento:
 			self.tabla.append((nombre, tipo, valor))
 		else:
-			self.tabla[desplazamiento] = (nombre, tipo, valor)
+			self.tabla[base + desplazamiento] = (nombre, tipo, valor)
 	
 	def _busqueda(self, nombre, base, desplazamiento, tipos_correctos, mensaje_tipo_incorrecto):
 		for i in range(base + desplazamiento, -1, -1):
-			if tabla[i][NOMBRE] == nombre:
-				if tabla[i][TIPO] in tipos_correctos:
+			if self.tabla[i][NOMBRE] == nombre:
+				if self.tabla[i][TIPO] in tipos_correctos:
 					return True
 				else:
 					self.out.write("Error Semantico: " + mensaje_tipo_incorrecto)
@@ -46,5 +49,7 @@ class AnalizadorSemantico(object):
 	def factor_correcto(self, nombre, base, desplazamiento):
 		return self._busqueda(nombre, base, desplazamiento, [VARIABLE, CONSTANTE], "Solo pueden usarse variables o constantes en una expresion")
 	
+	def __str__(self):
+		print self.tabla
 	
 	
