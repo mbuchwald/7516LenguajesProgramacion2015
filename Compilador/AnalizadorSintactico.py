@@ -206,7 +206,7 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 		else:
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
-				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + simbolo + "\n")
+				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + self.scanner.obtener_valor_actual() + "\n")
 				return
 			identificador = self.scanner.obtener_valor_actual()
 			if not self.semantico.asignacion_correcta(identificador, base, desplazamiento):
