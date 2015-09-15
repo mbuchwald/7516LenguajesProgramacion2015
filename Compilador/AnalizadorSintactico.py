@@ -283,6 +283,7 @@ if __name__ == "__main__":
 		ruta = sys.argv[1]
 	
 	al = AnalizadorLexico.AnalizadorLexico(ruta, output)
-	an_sintac = AnalizadorSintactico(al, output)
+	an_sem = AnalizadorSemantico.AnalizadorSemantico(output)
+	an_sintac = AnalizadorSintactico(al, an_sem, output)
 	an_sintac.parsear_programa()
 	output.close()
