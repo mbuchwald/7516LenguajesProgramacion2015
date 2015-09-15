@@ -131,7 +131,7 @@ class AnalizadorSintactico(object):
 				
 		elif valor.lower() == IF:
 			simbolo = self.scanner.obtener_simbolo()
-			self._parsear_condicion()
+			self._parsear_condicion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN:
 				simbolo = self.scanner.obtener_simbolo()
@@ -140,7 +140,7 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
 		elif valor.lower() == WHILE:
 			simbolo = self.scanner.obtener_simbolo()
-			self._parsear_condicion()
+			self._parsear_condicion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
 				simbolo = self.scanner.obtener_simbolo()
@@ -170,7 +170,7 @@ class AnalizadorSintactico(object):
 				valor = self.scanner.obtener_valor_actual()
 				simbolo = self.scanner.obtener_simbolo()
 			else:
-				self._parsear_expresion()
+				self._parsear_expresion(base, desplazamiento)
 				
 			while self.scanner.obtener_tipo_actual() == AnalizadorLexico.COMA:
 				simbolo = self.scanner.obtener_simbolo()
@@ -179,7 +179,7 @@ class AnalizadorSintactico(object):
 					valor = self.scanner.obtener_valor_actual()
 					simbolo = self.scanner.obtener_simbolo()
 				else:
-					self._parsear_expresion()
+					self._parsear_expresion(base, desplazamiento)
 				
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un cierre de parentesis luego de write \n")
@@ -217,55 +217,56 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Esperada asignacion luego de variable\n")
 				return
 			simbolo = self.scanner.obtener_simbolo()
-			self._parsear_expresion()
+			self._parsear_expresion(base, desplazamiento)
 		
-	def _parsear_condicion(self):
+	def _parsear_condicion(self, base, desplazamiento):
 		simbolo = self.scanner.obtener_tipo_actual()
 		valor = self.scanner.obtener_valor_actual()
 		if valor == ODD:
 			simbolo = self.scanner.obtener_simbolo()
-			self._parsear_expresion()
+			self._parsear_expresion(base, desplazamiento)
 		else:
-			self._parsear_expresion()
+			self._parsear_expresion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.IGUAL or simbolo == AnalizadorLexico.MAYOR or simbolo == AnalizadorLexico.MAYOR_IGUAL or simbolo == AnalizadorLexico.MENOR or simbolo == AnalizadorLexico.MENOR_IGUAL or simbolo == AnalizadorLexico.DISTINTO:
 				simbolo = self.scanner.obtener_simbolo()
-				self._parsear_expresion()
+				self._parsear_expresion(base, desplazamiento)
 			else:
 				self.out.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion")
 					
-	def _parsear_expresion(self):
+	def _parsear_expresion(self, base, desplazamiento):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.MAS or simbolo == AnalizadorLexico.MENOS:
 			simbolo = self.scanner.obtener_simbolo()
 		while True:
-			self._parsear_termino()
+			self._parsear_termino(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.MAS or simbolo == AnalizadorLexico.MENOS:
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				return
 				
-	def _parsear_termino(self):
+	def _parsear_termino(self, base, desplazamiento):
 		while True:
-			self._parsear_factor()
+			self._parsear_factor(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.MULTIPLICAR or simbolo == AnalizadorLexico.DIVIDIR:
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				return
 				
-	def _parsear_factor(self):
+	def _parsear_factor(self, base, desplazamiento):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.NUMERO:
 			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.IDENTIFICADOR:
-			#if self.semantico.factor_correcto(identificador, base, desplazamiento):
-			#	return
+			identificador = self.scanner.obtener_valor_actual()
+			if not self.semantico.factor_correcto(identificador, base, desplazamiento):
+				return
 			simbolo = self.scanner.obtener_simbolo()			
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
 			simbolo = self.scanner.obtener_simbolo()
-			self._parsear_expresion()
+			self._parsear_expresion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.CERRAR_PARENTESIS:
 				simbolo = self.scanner.obtener_simbolo()
