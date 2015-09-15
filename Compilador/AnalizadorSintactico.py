@@ -110,9 +110,9 @@ class AnalizadorSintactico(object):
 				continue
 			simbolo = self.scanner.obtener_simbolo()
 		
-		self._parsear_proposicion()
+		self._parsear_proposicion(base, desplazamiento)
 			
-	def _parsear_proposicion(self):
+	def _parsear_proposicion(self, base, desplazamiento):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo != AnalizadorLexico.IDENTIFICADOR and simbolo != AnalizadorLexico.RESERVADA:
 			return
@@ -124,15 +124,18 @@ class AnalizadorSintactico(object):
 		if valor.lower() == CALL:
 			simbolo = self.scanner.obtener_simbolo()
 			identificador = self.scanner.obtener_valor_actual()
-			#Validar que el identificador sea de un procedimiento
+			
+			if not self.semantico.invocacion_procedimiento_correcta(identificador, base, desplazamiento):
+				return
 			simbolo = self.scanner.obtener_simbolo()
+				
 		elif valor.lower() == IF:
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion()
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN:
 				simbolo = self.scanner.obtener_simbolo()
-				self._parsear_proposicion()
+				self._parsear_proposicion(base, desplazamiento)
 			else:
 				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
 		elif valor.lower() == WHILE:
@@ -141,13 +144,13 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
 				simbolo = self.scanner.obtener_simbolo()
-				self._parsear_proposicion()
+				self._parsear_proposicion(base, desplazamiento)
 			else:
 				self.out.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'\n")
 		elif valor.lower() == BEGIN:
 			while True:
 				simbolo = self.scanner.obtener_simbolo()
-				self._parsear_proposicion()
+				self._parsear_proposicion(base, desplazamiento)
 				simbolo = self.scanner.obtener_tipo_actual()
 				if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == END:
 					simbolo = self.scanner.obtener_simbolo()
@@ -205,7 +208,10 @@ class AnalizadorSintactico(object):
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + simbolo + "\n")
 				return
-			#TODO Validar identificador como variable
+			identificador = self.scanner.obtener_valor_actual()
+			if not self.semantico.asignacion_correcta(identificador, base, desplazamiento):
+				return
+			
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ASIGNACION:
 				self.out.write("Error Sintactico: Esperada asignacion luego de variable\n")
@@ -254,8 +260,9 @@ class AnalizadorSintactico(object):
 		if simbolo == AnalizadorLexico.NUMERO:
 			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.IDENTIFICADOR:
-			#Validar que sea constante o variable
-			simbolo = self.scanner.obtener_simbolo()
+			#if self.semantico.factor_correcto(identificador, base, desplazamiento):
+			#	return
+			simbolo = self.scanner.obtener_simbolo()			
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_expresion()

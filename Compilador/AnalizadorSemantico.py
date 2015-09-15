@@ -30,7 +30,7 @@ class AnalizadorSemantico(object):
 			self.tabla[base + desplazamiento] = (nombre, tipo, valor)
 	
 	def _busqueda(self, nombre, base, desplazamiento, tipos_correctos, mensaje_tipo_incorrecto):
-		for i in range(base + desplazamiento, -1, -1):
+		for i in range(base + desplazamiento - 1, -1, -1):
 			if self.tabla[i][NOMBRE] == nombre:
 				if self.tabla[i][TIPO] in tipos_correctos:
 					return True
