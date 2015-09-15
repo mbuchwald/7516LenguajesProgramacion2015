@@ -1,5 +1,6 @@
 import sys
 import AnalizadorLexico
+import AnalizadorSemantico
 
 CONST = "const"
 VAR = "var"
@@ -18,11 +19,13 @@ READLN = "readln"
 
 class AnalizadorSintactico(object):
 	
-	def __init__(self, scanner, output):
+	def __init__(self, scanner, semantico, output):
 		self.out = output
 		self.scanner = scanner
+		self.semantico = semantico
 	
-	def _parsear_bloque(self):
+	def _parsear_bloque(self, base = 0):
+		desplazamiento = 0
 		simbolo = self.scanner.obtener_simbolo()
 		valor = self.scanner.obtener_valor_actual()
 		#Analizamos la parte de constantes:
@@ -31,7 +34,11 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
-					#TODO: mandar al analizador semantico para ver que sea correcto el identificador!
+					try:
+						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.CONSTANTE)
+						desplazamiento += 1
+					except:
+						continue #por ahora
 				
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.IGUAL:
@@ -63,7 +70,12 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
-					#TODO: definir identificador como variable, analizador que no sea reservada ni constante ni variable, etc...
+					try:
+						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.VARIABLE)
+						desplazamiento += 1
+					except:
+						continue #por ahora
+					
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
 						simbolo = self.scanner.obtener_simbolo()
@@ -81,12 +93,18 @@ class AnalizadorSintactico(object):
 				output.write("Error Sintactico: declaracion de procedimiento no seguida de un identificador\n")
 				continue
 			identificador = self.scanner.obtener_valor_actual()
-			#TODO: definir identificador como procedimiento + validaciones
+			
+			try: 
+				self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.PROCEDIMIENTO)
+				desplazamiento += 1
+			except:
+				continue #por ahora
+			
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.PUNTO_Y_COMA:
 				output.write("Error Sintactico: Luego de la identificacion de un procedimiento se esperaba por punto y coma (;)\n")
 				continue
-			self._parsear_bloque() #ver como hacer para que quede asociado al identificador
+			self._parsear_bloque(base + desplazamiento) #ver como hacer para que quede asociado al identificador
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
 				output.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
 				continue
