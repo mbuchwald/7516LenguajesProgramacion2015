@@ -35,7 +35,7 @@ class AnalizadorSemantico(object):
 				if self.tabla[i][TIPO] in tipos_correctos:
 					return True
 				else:
-					self.out.write("Error Semantico: " + mensaje_tipo_incorrecto)
+					self.out.write("Error Semantico: " + mensaje_tipo_incorrecto + "\n")
 					return False
 		self.out.write("Error Semantico: Identificador no encontrado\n")
 		return False
@@ -50,6 +50,6 @@ class AnalizadorSemantico(object):
 		return self._busqueda(nombre, base, desplazamiento, [VARIABLE, CONSTANTE], "Solo pueden usarse variables o constantes en una expresion")
 	
 	def __str__(self):
-		print self.tabla
+		return str(self.tabla)
 	
 	
