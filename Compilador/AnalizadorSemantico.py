@@ -49,6 +49,9 @@ class AnalizadorSemantico(object):
 	def factor_correcto(self, nombre, base, desplazamiento):
 		return self._busqueda(nombre, base, desplazamiento, [VARIABLE, CONSTANTE], "Solo pueden usarse variables o constantes en una expresion")
 	
+	def lectura_correcta(self, nombre, base, desplazamiento):
+		return self._busqueda(nombre, base, desplazamiento, [VARIABLE], "Solo pueden asignarse valores de lecturas en variables")
+	
 	def __str__(self):
 		return str(self.tabla)
 	

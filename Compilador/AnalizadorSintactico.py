@@ -194,6 +194,10 @@ class AnalizadorSintactico(object):
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
 				return
+			identificador = self.scanner.obtener_valor_actual()
+			
+			self.semantico.lectura_correcta(identificador, base, desplazamiento)
+						
 			simbolo = self.scanner.obtener_simbolo()
 			while simbolo == AnalizadorLexico.COMA:
 				simbolo = self.scanner.obtener_simbolo()
