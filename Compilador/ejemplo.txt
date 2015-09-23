@@ -1,2 +1,0 @@
-const constante = 10;
-.
