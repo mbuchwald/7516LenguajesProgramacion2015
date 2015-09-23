@@ -2,6 +2,7 @@
 PROCEDIMIENTO = "procedimiento"
 VARIABLE = "variable"
 CONSTANTE = "constante"
+COMODIN = "comodin"
 
 NOMBRE = 0
 TIPO = 1
@@ -32,12 +33,13 @@ class AnalizadorSemantico(object):
 	def _busqueda(self, nombre, base, desplazamiento, tipos_correctos, mensaje_tipo_incorrecto):
 		for i in range(base + desplazamiento - 1, -1, -1):
 			if self.tabla[i][NOMBRE] == nombre:
-				if self.tabla[i][TIPO] in tipos_correctos:
+				if self.tabla[i][TIPO] in tipos_correctos or self.tabla[i][TIPO] == COMODIN:
 					return True
 				else:
 					self.out.write("Error Semantico: " + mensaje_tipo_incorrecto + "\n")
 					return False
 		self.out.write("Error Semantico: Identificador no encontrado\n")
+		self.agregar_identificador(base, desplazamiento, nombre, COMODIN)
 		return False
 		
 	def asignacion_correcta(self, nombre, base, desplazamiento):
