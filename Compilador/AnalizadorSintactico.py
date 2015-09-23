@@ -157,7 +157,11 @@ class AnalizadorSintactico(object):
 					break
 				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
 					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin\n")
-					break
+					#indicar que no se genera codigo
+					#Asumimos que venia un ;
+					if simbolo != AnalizadorLexico.COMA: 
+						self.scanner.frenar()
+					
 		elif valor.lower() == WRITE or valor.lower() == WRITELN:
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
@@ -167,6 +171,8 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo == AnalizadorLexico.CADENA:
 				#hacemos algo con esto
+				if self.scanner.error_en_cadena:
+					pass #indicamos que no se puede generar codigo
 				valor = self.scanner.obtener_valor_actual()
 				simbolo = self.scanner.obtener_simbolo()
 			else:
@@ -213,13 +219,15 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + self.scanner.obtener_valor_actual() + "\n")
 				return
 			identificador = self.scanner.obtener_valor_actual()
-			if not self.semantico.asignacion_correcta(identificador, base, desplazamiento):
-				return
+			
+			if self.semantico.asignacion_correcta(identificador, base, desplazamiento):
+				pass #indicar que no se genera codigo		
 			
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ASIGNACION:
 				self.out.write("Error Sintactico: Esperada asignacion luego de variable\n")
-				return
+				#indicar que no se genera codigo
+				
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_expresion(base, desplazamiento)
 		

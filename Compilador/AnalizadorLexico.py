@@ -2,6 +2,7 @@ ANULADOS = [" ", "\t"]
 QUIEBRE = ["#", "\n"]
 VACIO = ""
 COMILLAS = "'"
+COMILLA_ERROR = "\""
 
 PALABRAS_RESERVADAS = ["if", "const", "var", "procedure", "call", "if", "while", "begin", "then", "do", "odd", "end", "write", "writeln", "readln"]
 
@@ -41,6 +42,8 @@ class AnalizadorLexico(object):
 		self._leer_linea()
 		self.valor = None
 		self.tipo = None
+		self.freno = False
+		self.cadena_error = True
 	
 	def _leer_archivo(self, program_path):
 		self.lineas = []
@@ -68,7 +71,20 @@ class AnalizadorLexico(object):
 	def obtener_tipo_actual(self):
 		return self.tipo
 	
+	def frenar(self):
+		self.freno = True
+	
+	def error_en_cadena(self):
+		if self.cadena_error:
+			self.cadena_error = False
+			return True
+		return False
+	
 	def obtener_simbolo(self):
+		if self.freno:
+			self.freno = False
+			return self.tipo
+			
 		while self.quedan_lineas:
 			for index, c in enumerate(self.linea_actual):
 				if c in ANULADOS: continue
@@ -109,7 +125,7 @@ class AnalizadorLexico(object):
 					self.tipo = ESPECIALES[c]
 					return self.tipo
 				
-				if c == COMILLAS:
+				if c == COMILLAS or c == COMILLA_ERROR:
 					self._obtener_cadena(index)
 					if self.valor is None:
 						self.out.write("Error Lexico: Cadena no finalizada antes que finalice el archivo\n")
@@ -138,14 +154,21 @@ class AnalizadorLexico(object):
 		
 	def _obtener_cadena(self, index):
 		formado = ""
+		if self.linea_actual[index] == COMILLA_ERROR: 
+			self.out.write("Error Lexico: comillas de cadena incorrecta\n")
+			self.cadena_error = True
 		index += 1
 		while self.quedan_lineas:
 			for i in range(index, len(self.linea_actual)):
 				c = self.linea_actual[i]
-				if c == COMILLAS:
+				if c == COMILLAS or c == COMILLA_ERROR:
 					self.valor = formado
 					self.linea_actual = self.linea_actual[i+1:]
+					if c == COMILLA_ERROR and not self.cadena_error:
+						self.out.write("Error Lexico: comillas de cadena incorrecta\n")
+						self.cadena_error = True
 					return
+					
 				formado += c
 			self._leer_linea()
 			index = 0
