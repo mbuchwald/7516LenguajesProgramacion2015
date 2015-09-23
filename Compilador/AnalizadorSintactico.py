@@ -138,6 +138,7 @@ class AnalizadorSintactico(object):
 				self._parsear_proposicion(base, desplazamiento)
 			else:
 				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
+				self.scanner.frenar()
 		elif valor.lower() == WHILE:
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion(base, desplazamiento)
