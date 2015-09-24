@@ -108,8 +108,10 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.PUNTO_Y_COMA:
 				output.write("Error Sintactico: Luego de la identificacion de un procedimiento se esperaba por punto y coma (;)\n")
-				continue
-			self._parsear_bloque(base + desplazamiento) #ver como hacer para que quede asociado al identificador
+				#indicar que no se genera codigo
+				self.scanner.frenar()
+				#continue
+			self._parsear_bloque(base + desplazamiento) 
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
 				output.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
 				continue
@@ -234,6 +236,7 @@ class AnalizadorSintactico(object):
 		else:
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + self.scanner.obtener_valor_actual() + "\n")
+				self.scanner.obtener_simbolo()
 				return
 			identificador = self.scanner.obtener_valor_actual()
 			
