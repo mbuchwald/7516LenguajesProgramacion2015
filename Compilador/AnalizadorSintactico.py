@@ -38,7 +38,8 @@ class AnalizadorSintactico(object):
 						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.CONSTANTE)
 						desplazamiento += 1
 					except:
-						continue #por ahora
+						#indicar que no se genera codigo
+						pass 
 				
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.IGUAL:
@@ -74,7 +75,8 @@ class AnalizadorSintactico(object):
 						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.VARIABLE)
 						desplazamiento += 1
 					except:
-						continue #por ahora
+						#indicar que no se genera codigo
+						pass 
 					
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
@@ -143,11 +145,14 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			self._parsear_condicion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
-			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == DO:
-				simbolo = self.scanner.obtener_simbolo()
-				self._parsear_proposicion(base, desplazamiento)
-			else:
+			if not (simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == DO):
 				self.out.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'\n")
+				#indicar que no se genera codigo
+				if not (simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN):
+					self.scanner.frenar()
+			simbolo = self.scanner.obtener_simbolo()
+			self._parsear_proposicion(base, desplazamiento)
+			
 		elif valor.lower() == BEGIN:
 			while True:
 				simbolo = self.scanner.obtener_simbolo()
@@ -168,7 +173,10 @@ class AnalizadorSintactico(object):
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
 				if valor == WRITE:
 					self.out.write("Error Sintactico: Se esperaba un parentesis luego de write \n")
-				return
+					#indicar que no se genera codigo
+					self.scanner.frenar()
+				else:
+					return
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo == AnalizadorLexico.CADENA:
 				#hacemos algo con esto
@@ -190,17 +198,19 @@ class AnalizadorSintactico(object):
 				
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un cierre de parentesis luego de write \n")
+				#indicar que no se genera codigo
 			simbolo = self.scanner.obtener_simbolo()	
 			
 		elif valor.lower() == READLN:
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un parentesis luego de readln \n")
-				return
+				#indicar que no se genera codigo
+				self.scanner.frenar()
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
-				return
+				
 			identificador = self.scanner.obtener_valor_actual()
 			
 			self.semantico.lectura_correcta(identificador, base, desplazamiento)
@@ -210,10 +220,13 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo != AnalizadorLexico.IDENTIFICADOR:
 					self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
-					return
+					#indicar que no se genera codigo
+					self.scanner.frenar()
 				simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba cierre de parentesis luego de readln \n")
+				#indicar que no se genera codigo
+				self.scanner.frenar()
 			simbolo = self.scanner.obtener_simbolo()
 		else:
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
@@ -245,7 +258,10 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				self._parsear_expresion(base, desplazamiento)
 			else:
-				self.out.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion")
+				self.out.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion\n")
+				#indicar que no se genera codigo
+				self._parsear_expresion(base, desplazamiento)
+				
 					
 	def _parsear_expresion(self, base, desplazamiento):
 		simbolo = self.scanner.obtener_tipo_actual()
@@ -284,9 +300,12 @@ class AnalizadorSintactico(object):
 			if simbolo == AnalizadorLexico.CERRAR_PARENTESIS:
 				simbolo = self.scanner.obtener_simbolo()
 			else:
-				self.out.write("Error Sintactico: Cierre de parentesis faltante")
+				self.out.write("Error Sintactico: Cierre de parentesis faltante\n")
+				#indicar que no se genera codigo
+				#self.scanner.frenar()
 		else:
-			self.out.write("Error Sintactico: Identificador no esperado")
+			self.out.write("Error Sintactico: Identificador no esperado\n")
+			#indicar que no se genera codigo
 				
 			
 	def parsear_programa(self):
