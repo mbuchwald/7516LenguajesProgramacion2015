@@ -77,17 +77,20 @@ class AnalizadorSintactico(object):
 					except:
 						#indicar que no se genera codigo
 						pass 
-					
-					simbolo = self.scanner.obtener_simbolo()
-					if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
-						simbolo = self.scanner.obtener_simbolo()
-						break
-					elif simbolo != AnalizadorLexico.COMA:
-						output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de variable\n")
-						break
-				else:
+				else: 
 					output.write("Error Sintactico: declaracion de variable no seguida de un identificador\n")
+					#indicar que no se genera codigo
+					
+				simbolo = self.scanner.obtener_simbolo()
+				if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
+					simbolo = self.scanner.obtener_simbolo()
 					break
+				elif simbolo != AnalizadorLexico.COMA:
+					output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de variable\n")
+					#indicar que no se genera codigo
+					self.scanner.frenar()
+					
+					
 		
 		while simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == PROCEDURE:
 			simbolo = self.scanner.obtener_simbolo()
