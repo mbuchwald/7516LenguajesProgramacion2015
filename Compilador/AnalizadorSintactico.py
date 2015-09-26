@@ -186,7 +186,7 @@ class AnalizadorSintactico(object):
 					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin\n")
 					#indicar que no se genera codigo
 					#Asumimos que venia un ;
-					if simbolo == AnalizadorLexico.ERROR_LEXICO:
+					if simbolo == AnalizadorLexico.ERROR_LEXICO or simbolo == AnalizadorLexico.EOF:
 						break
 					elif simbolo != AnalizadorLexico.COMA:
 						self.scanner.frenar()

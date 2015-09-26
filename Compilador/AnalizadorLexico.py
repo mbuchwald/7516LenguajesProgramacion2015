@@ -156,6 +156,7 @@ class AnalizadorLexico(object):
 				return ERROR_LEXICO
 						
 			self._leer_linea()
+		self.tipo = EOF
 		return EOF
 	
 	def _obtener_completo(self, index, numero = False):
