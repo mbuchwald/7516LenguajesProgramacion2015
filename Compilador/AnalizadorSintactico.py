@@ -34,6 +34,9 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
+					if self.scanner.identificador_largo():
+						#indicar que no se genera codigo
+						pass
 					try:
 						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.CONSTANTE)
 						desplazamiento += 1
@@ -73,6 +76,9 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
+					if self.scanner.identificador_largo():
+						#indicar que no se genera codigo
+						pass
 					try:
 						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.VARIABLE)
 						desplazamiento += 1
@@ -100,7 +106,9 @@ class AnalizadorSintactico(object):
 				output.write("Error Sintactico: declaracion de procedimiento no seguida de un identificador\n")
 				continue
 			identificador = self.scanner.obtener_valor_actual()
-			
+			if self.scanner.identificador_largo():
+				#indicar que no se genera codigo
+				pass
 			try: 
 				self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.PROCEDIMIENTO)
 				desplazamiento += 1
@@ -173,8 +181,11 @@ class AnalizadorSintactico(object):
 					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin\n")
 					#indicar que no se genera codigo
 					#Asumimos que venia un ;
-					if simbolo != AnalizadorLexico.COMA: 
+					if simbolo == AnalizadorLexico.ERROR_LEXICO:
+						break
+					elif simbolo != AnalizadorLexico.COMA:
 						self.scanner.frenar()
+					
 					
 		elif valor.lower() == WRITE or valor.lower() == WRITELN:
 			simbolo = self.scanner.obtener_simbolo()
