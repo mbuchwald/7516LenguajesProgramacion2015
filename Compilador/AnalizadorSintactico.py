@@ -45,27 +45,32 @@ class AnalizadorSintactico(object):
 						pass 
 				
 					simbolo = self.scanner.obtener_simbolo()
-					if simbolo == AnalizadorLexico.IGUAL:
-						simbolo = self.scanner.obtener_simbolo()
-						if simbolo == AnalizadorLexico.NUMERO:
-							valor = self.scanner.obtener_valor_actual()
-							#TODO: asignarle el valor al identificador
-						else:
-							output.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
-							#indicar que no se genera codigo
-							self.scanner.frenar()
-														
-						simbolo = self.scanner.obtener_simbolo()
-						if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
-							simbolo = self.scanner.obtener_simbolo()
-							break
-						elif simbolo != AnalizadorLexico.COMA:
-							output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
-							#indicar que no se genera codigo
-							self.scanner.frenar()
-					else:
+					if simbolo != AnalizadorLexico.IGUAL:
 						output.write("Error Sintactico: asignacion de constante esperada (=)\n")
+						self.scanner.frenar()
 						#indicar que no se genera codigo
+						
+					simbolo = self.scanner.obtener_simbolo()
+					if simbolo == AnalizadorLexico.NUMERO:
+						if self.scanner.numero_largo():
+							#indicar que no se genera codigo
+							pass
+						valor = self.scanner.obtener_valor_actual()
+						#TODO: asignarle el valor al identificador
+					else:
+						output.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
+						#indicar que no se genera codigo
+						self.scanner.frenar()
+													
+					simbolo = self.scanner.obtener_simbolo()
+					if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
+						simbolo = self.scanner.obtener_simbolo()
+						break
+					elif simbolo != AnalizadorLexico.COMA:
+						output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
+						#indicar que no se genera codigo
+						self.scanner.frenar()
+						
 				else:
 					output.write("Error Sintactico: declaracion de constante no seguida de un identificador\n")
 					break
@@ -307,11 +312,15 @@ class AnalizadorSintactico(object):
 	def _parsear_factor(self, base, desplazamiento):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.NUMERO:
+			if self.scanner.numero_largo():
+				#indicar que no se genera codigo
+				pass
 			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.IDENTIFICADOR:
 			identificador = self.scanner.obtener_valor_actual()
 			if not self.semantico.factor_correcto(identificador, base, desplazamiento):
-				return
+				#indicar que no se genera codigo
+				pass
 			simbolo = self.scanner.obtener_simbolo()			
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
 			simbolo = self.scanner.obtener_simbolo()

@@ -30,7 +30,8 @@ EOF = "EOF"
 CADENA = "CADENA"
 ESPECIALES = {"+": MAS, "-": MENOS, "*": MULTIPLICAR, "/": DIVIDIR, ".": PUNTO, ",": COMA, ";": PUNTO_Y_COMA, "=": IGUAL, "(": ABRIR_PARENTESIS, ")": CERRAR_PARENTESIS }	
 
-LARGO_IDENTIFICADOR = 20
+LARGO_IDENTIFICADOR_MAX = 20
+LARGO_NUMERO_MAX = 8
 	
 class AnalizadorLexico(object):
 	
@@ -69,14 +70,19 @@ class AnalizadorLexico(object):
 	def obtener_valor_actual(self):
 		return self.valor
 		
-	def identificador_largo(self):
-		if self.tipo != IDENTIFICADOR: 
+	def _largo(self, esperado, largo, mensaje_error):
+		if self.tipo != esperado: 
 			raise TypeError("Consultando largo de identificador para un token no identificador")
-		if len(self.valor) > LARGO_IDENTIFICADOR:
-			self.out.write("Error Lexico: Identificador demasiado largo\n")
+		if len(self.valor) > largo:
+			self.out.write("Error Lexico: " + mensaje_error + "\n")
 			return True
 		return False
-		
+	
+	def identificador_largo(self):
+		return self._largo(IDENTIFICADOR, LARGO_IDENTIFICADOR_MAX, "Identificador demasiado largo")
+	
+	def numero_largo(self):
+		return self._largo(NUMERO, LARGO_NUMERO_MAX, "Numero demasiado largo")
 		
 	def obtener_tipo_actual(self):
 		return self.tipo
