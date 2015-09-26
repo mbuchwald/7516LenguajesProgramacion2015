@@ -47,20 +47,22 @@ class AnalizadorSintactico(object):
 						if simbolo == AnalizadorLexico.NUMERO:
 							valor = self.scanner.obtener_valor_actual()
 							#TODO: asignarle el valor al identificador
-							
-							simbolo = self.scanner.obtener_simbolo()
-							if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
-								simbolo = self.scanner.obtener_simbolo()
-								break
-							elif simbolo != AnalizadorLexico.COMA:
-								output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
-								break
 						else:
 							output.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
+							#indicar que no se genera codigo
+							self.scanner.frenar()
+														
+						simbolo = self.scanner.obtener_simbolo()
+						if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
+							simbolo = self.scanner.obtener_simbolo()
 							break
+						elif simbolo != AnalizadorLexico.COMA:
+							output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
+							#indicar que no se genera codigo
+							self.scanner.frenar()
 					else:
 						output.write("Error Sintactico: asignacion de constante esperada (=)\n")
-						break
+						#indicar que no se genera codigo
 				else:
 					output.write("Error Sintactico: declaracion de constante no seguida de un identificador\n")
 					break
@@ -133,7 +135,8 @@ class AnalizadorSintactico(object):
 			identificador = self.scanner.obtener_valor_actual()
 			
 			if not self.semantico.invocacion_procedimiento_correcta(identificador, base, desplazamiento):
-				return
+				#indicar que no se genera codigo
+				pass
 			simbolo = self.scanner.obtener_simbolo()
 				
 		elif valor.lower() == IF:
