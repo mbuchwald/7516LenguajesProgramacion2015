@@ -38,8 +38,7 @@ class AnalizadorSemantico(object):
 				else:
 					self.out.write("Error Semantico: " + mensaje_tipo_incorrecto + "\n")
 					return False
-		self.out.write("Error Semantico: Identificador no encontrado\n")
-		self.agregar_identificador(base, desplazamiento, nombre, COMODIN)
+		self.out.write("Error Semantico: Identificador no encontrado ("+ nombre +")\n")
 		return False
 		
 	def asignacion_correcta(self, nombre, base, desplazamiento):
@@ -53,6 +52,13 @@ class AnalizadorSemantico(object):
 	
 	def lectura_correcta(self, nombre, base, desplazamiento):
 		return self._busqueda(nombre, base, desplazamiento, [VARIABLE], "Solo pueden asignarse valores de lecturas en variables")
+		
+	def agregar_comodin(self, nombre, base, desplazamiento):
+		for i in range(base + desplazamiento - 1, -1, -1):
+			if self.tabla[i][NOMBRE] == nombre:
+				return False
+		self.agregar_identificador(base, desplazamiento, nombre, COMODIN)
+		return True
 	
 	def __str__(self):
 		return str(self.tabla)
