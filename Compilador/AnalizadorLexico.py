@@ -45,7 +45,7 @@ class AnalizadorLexico(object):
 		self.valor = None
 		self.tipo = None
 		self.freno = False
-		self.cadena_error = True
+		self.cadena_error = False
 	
 	def _leer_archivo(self, program_path):
 		self.lineas = []

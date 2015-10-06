@@ -18,10 +18,11 @@ READLN = "readln"
 
 class AnalizadorSintactico(object):
 	
-	def __init__(self, scanner, semantico, output):
+	def __init__(self, scanner, semantico, generador, output):
 		self.out = output
 		self.scanner = scanner
 		self.semantico = semantico
+		self.generador = generador
 	
 	def _parsear_bloque(self, base = 0):
 		desplazamiento = 0
@@ -34,31 +35,29 @@ class AnalizadorSintactico(object):
 				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
 					if self.scanner.identificador_largo():
-						#indicar que no se genera codigo
-						pass
+						self.generador = self.generador.no_generar()
 					try:
 						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.CONSTANTE)
 						desplazamiento += 1
 					except:
-						#indicar que no se genera codigo
-						pass 
+						self.generador = self.generador.no_generar()
 				
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo != AnalizadorLexico.IGUAL:
 						self.out.write("Error Sintactico: asignacion de constante esperada (=)\n")
 						self.scanner.frenar()
-						#indicar que no se genera codigo
+						self.generador = self.generador.no_generar()
 						
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.NUMERO:
 						if self.scanner.numero_largo():
-							#indicar que no se genera codigo
-							pass
+							self.generador = self.generador.no_generar()
+							
 						valor = self.scanner.obtener_valor_actual()
 						#TODO: asignarle el valor al identificador
 					else:
 						self.out.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
-						#indicar que no se genera codigo
+						self.generador = self.generador.no_generar()
 						self.scanner.frenar()
 													
 					simbolo = self.scanner.obtener_simbolo()
@@ -67,7 +66,7 @@ class AnalizadorSintactico(object):
 						break
 					elif simbolo != AnalizadorLexico.COMA:
 						self.out.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
-						#indicar que no se genera codigo
+						self.generador = self.generador.no_generar()
 						self.scanner.frenar()
 						
 				else:
@@ -81,17 +80,15 @@ class AnalizadorSintactico(object):
 				if simbolo == AnalizadorLexico.IDENTIFICADOR:
 					identificador = self.scanner.obtener_valor_actual()
 					if self.scanner.identificador_largo():
-						#indicar que no se genera codigo
-						pass
+						self.generador = self.generador.no_generar()
 					try:
 						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.VARIABLE)
 						desplazamiento += 1
 					except:
-						#indicar que no se genera codigo
-						pass 
+						self.generador = self.generador.no_generar()
 				else: 
 					self.out.write("Error Sintactico: declaracion de variable no seguida de un identificador\n")
-					#indicar que no se genera codigo
+					self.generador = self.generador.no_generar()
 					
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
@@ -99,11 +96,9 @@ class AnalizadorSintactico(object):
 					break
 				elif simbolo != AnalizadorLexico.COMA:
 					self.out.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de variable\n")
-					#indicar que no se genera codigo
+					self.generador = self.generador.no_generar()
 					self.scanner.frenar()
 					
-					
-		
 		while simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == PROCEDURE:
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
@@ -111,23 +106,24 @@ class AnalizadorSintactico(object):
 				continue
 			identificador = self.scanner.obtener_valor_actual()
 			if self.scanner.identificador_largo():
-				#indicar que no se genera codigo
-				pass
+				self.generador = self.generador.no_generar()
 			try: 
 				self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.PROCEDIMIENTO)
 				desplazamiento += 1
 			except:
-				continue #por ahora
+				self.generador = self.generador.no_generar()
+				continue
 			
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.PUNTO_Y_COMA:
 				self.out.write("Error Sintactico: Luego de la identificacion de un procedimiento se esperaba por punto y coma (;)\n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
 				#continue
 			self._parsear_bloque(base + desplazamiento) 
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
 				self.out.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
+				self.generador = self.generador.no_generar()
 				continue
 			simbolo = self.scanner.obtener_simbolo()
 		
@@ -147,7 +143,7 @@ class AnalizadorSintactico(object):
 			identificador = self.scanner.obtener_valor_actual()
 			
 			if not self.semantico.invocacion_procedimiento_correcta(identificador, base, desplazamiento):
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				if self.semantico.agregar_comodin(identificador, base, desplazamiento):
 					desplazamiento += 1
 			simbolo = self.scanner.obtener_simbolo()
@@ -161,6 +157,7 @@ class AnalizadorSintactico(object):
 				desplazamiento = self._parsear_proposicion(base, desplazamiento)
 			else:
 				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
+				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
 		elif valor.lower() == WHILE:
 			simbolo = self.scanner.obtener_simbolo()
@@ -168,7 +165,7 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_tipo_actual()
 			if not (simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == DO):
 				self.out.write("Error Sintactico: Se esperaba un 'do' luego de la condicion de un 'while'\n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				if not (simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN):
 					self.scanner.frenar()
 			simbolo = self.scanner.obtener_simbolo()
@@ -184,8 +181,7 @@ class AnalizadorSintactico(object):
 					break
 				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
 					self.out.write("Error Sintactico: Se esperaba un END o punto y coma (;) luego de una proposicion de un Begin\n")
-					#indicar que no se genera codigo
-					#Asumimos que venia un ;
+					self.generador = self.generador.no_generar()
 					if simbolo == AnalizadorLexico.ERROR_LEXICO or simbolo == AnalizadorLexico.EOF:
 						break
 					elif simbolo != AnalizadorLexico.COMA:
@@ -197,15 +193,15 @@ class AnalizadorSintactico(object):
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
 				if valor == WRITE:
 					self.out.write("Error Sintactico: Se esperaba un parentesis luego de write \n")
-					#indicar que no se genera codigo
+					self.generador = self.generador.no_generar()
 					self.scanner.frenar()
 				else:
 					return desplazamiento
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo == AnalizadorLexico.CADENA:
 				#hacemos algo con esto
-				if self.scanner.error_en_cadena:
-					pass #indicamos que no se puede generar codigo
+				if self.scanner.error_en_cadena():
+					self.generador = self.generador.no_generar()
 				valor = self.scanner.obtener_valor_actual()
 				simbolo = self.scanner.obtener_simbolo()
 			else:
@@ -222,14 +218,14 @@ class AnalizadorSintactico(object):
 				
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un cierre de parentesis luego de write \n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 			simbolo = self.scanner.obtener_simbolo()	
 			
 		elif valor.lower() == READLN:
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un parentesis luego de readln \n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
@@ -246,12 +242,12 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo != AnalizadorLexico.IDENTIFICADOR:
 					self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
-					#indicar que no se genera codigo
+					self.generador = self.generador.no_generar()
 					self.scanner.frenar()
 				simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba cierre de parentesis luego de readln \n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
 			simbolo = self.scanner.obtener_simbolo()
 		else:
@@ -268,7 +264,7 @@ class AnalizadorSintactico(object):
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ASIGNACION:
 				self.out.write("Error Sintactico: Esperada asignacion luego de variable\n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				
 			simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_expresion(base, desplazamiento)
@@ -288,7 +284,7 @@ class AnalizadorSintactico(object):
 				desplazamiento = self._parsear_expresion(base, desplazamiento)
 			else:
 				self.out.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion\n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				desplazamiento = self._parsear_expresion(base, desplazamiento)
 		return desplazamiento		
 					
@@ -317,8 +313,7 @@ class AnalizadorSintactico(object):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.NUMERO:
 			if self.scanner.numero_largo():
-				#indicar que no se genera codigo
-				pass
+				self.generador = self.generador.no_generar()
 			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.IDENTIFICADOR:
 			identificador = self.scanner.obtener_valor_actual()
@@ -334,11 +329,11 @@ class AnalizadorSintactico(object):
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				self.out.write("Error Sintactico: Cierre de parentesis faltante\n")
-				#indicar que no se genera codigo
+				self.generador = self.generador.no_generar()
 				#self.scanner.frenar()
 		else:
 			self.out.write("Error Sintactico: Identificador no esperado\n")
-			#indicar que no se genera codigo
+			self.generador = self.generador.no_generar()
 		return desplazamiento
 			
 	def parsear_programa(self):
@@ -346,4 +341,5 @@ class AnalizadorSintactico(object):
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo != AnalizadorLexico.PUNTO:
 			self.out.write("Error Sintactico: Se esperaba punto (.) de finalizacion de programa\n")
+			self.generador = self.generador.no_generar()
 		
