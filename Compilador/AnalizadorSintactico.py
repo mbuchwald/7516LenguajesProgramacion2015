@@ -1,4 +1,3 @@
-import sys
 import AnalizadorLexico
 import AnalizadorSemantico
 
@@ -46,7 +45,7 @@ class AnalizadorSintactico(object):
 				
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo != AnalizadorLexico.IGUAL:
-						output.write("Error Sintactico: asignacion de constante esperada (=)\n")
+						self.out.write("Error Sintactico: asignacion de constante esperada (=)\n")
 						self.scanner.frenar()
 						#indicar que no se genera codigo
 						
@@ -58,7 +57,7 @@ class AnalizadorSintactico(object):
 						valor = self.scanner.obtener_valor_actual()
 						#TODO: asignarle el valor al identificador
 					else:
-						output.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
+						self.out.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
 						#indicar que no se genera codigo
 						self.scanner.frenar()
 													
@@ -67,12 +66,12 @@ class AnalizadorSintactico(object):
 						simbolo = self.scanner.obtener_simbolo()
 						break
 					elif simbolo != AnalizadorLexico.COMA:
-						output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
+						self.out.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de constante\n")
 						#indicar que no se genera codigo
 						self.scanner.frenar()
 						
 				else:
-					output.write("Error Sintactico: declaracion de constante no seguida de un identificador\n")
+					self.out.write("Error Sintactico: declaracion de constante no seguida de un identificador\n")
 					break
 					
 		valor = self.scanner.obtener_valor_actual()
@@ -91,7 +90,7 @@ class AnalizadorSintactico(object):
 						#indicar que no se genera codigo
 						pass 
 				else: 
-					output.write("Error Sintactico: declaracion de variable no seguida de un identificador\n")
+					self.out.write("Error Sintactico: declaracion de variable no seguida de un identificador\n")
 					#indicar que no se genera codigo
 					
 				simbolo = self.scanner.obtener_simbolo()
@@ -99,7 +98,7 @@ class AnalizadorSintactico(object):
 					simbolo = self.scanner.obtener_simbolo()
 					break
 				elif simbolo != AnalizadorLexico.COMA:
-					output.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de variable\n")
+					self.out.write("Error Sintactico: Se esperaba punto y coma (;) o coma (,) luego de declaracion de variable\n")
 					#indicar que no se genera codigo
 					self.scanner.frenar()
 					
@@ -108,7 +107,7 @@ class AnalizadorSintactico(object):
 		while simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == PROCEDURE:
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
-				output.write("Error Sintactico: declaracion de procedimiento no seguida de un identificador\n")
+				self.out.write("Error Sintactico: declaracion de procedimiento no seguida de un identificador\n")
 				continue
 			identificador = self.scanner.obtener_valor_actual()
 			if self.scanner.identificador_largo():
@@ -122,13 +121,13 @@ class AnalizadorSintactico(object):
 			
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.PUNTO_Y_COMA:
-				output.write("Error Sintactico: Luego de la identificacion de un procedimiento se esperaba por punto y coma (;)\n")
+				self.out.write("Error Sintactico: Luego de la identificacion de un procedimiento se esperaba por punto y coma (;)\n")
 				#indicar que no se genera codigo
 				self.scanner.frenar()
 				#continue
 			self._parsear_bloque(base + desplazamiento) 
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
-				output.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
+				self.out.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
 				continue
 			simbolo = self.scanner.obtener_simbolo()
 		
@@ -346,18 +345,5 @@ class AnalizadorSintactico(object):
 		self._parsear_bloque()
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo != AnalizadorLexico.PUNTO:
-			output.write("Error Sintactico: Se esperaba punto (.) de finalizacion de programa\n")
+			self.out.write("Error Sintactico: Se esperaba punto (.) de finalizacion de programa\n")
 		
-
-
-if __name__ == "__main__":
-	output = open("salida.txt", "w")
-	ruta = "Archivos/BIEN-09.PL0"
-	if len(sys.argv) > 1:
-		ruta = sys.argv[1]
-	
-	al = AnalizadorLexico.AnalizadorLexico(ruta, output)
-	an_sem = AnalizadorSemantico.AnalizadorSemantico(output)
-	an_sintac = AnalizadorSintactico(al, an_sem, output)
-	an_sintac.parsear_programa()
-	output.close()
