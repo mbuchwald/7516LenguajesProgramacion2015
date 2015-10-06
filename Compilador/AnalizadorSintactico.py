@@ -342,4 +342,5 @@ class AnalizadorSintactico(object):
 		if simbolo != AnalizadorLexico.PUNTO:
 			self.out.write("Error Sintactico: Se esperaba punto (.) de finalizacion de programa\n")
 			self.generador = self.generador.no_generar()
+		self.generador.finalizar()
 		
