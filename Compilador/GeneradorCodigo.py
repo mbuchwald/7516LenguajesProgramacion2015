@@ -18,8 +18,13 @@ class GeneradorLinux(object):
 		self.buffer = ""
 		self._agregar_header()
 	
+	def _flush(self):
+		self.ejecutable.write(self.buffer)
+		self.buffer = ""
+	
 	def _agregar_header(self):
-		self.buffer += header_fix.header
+		self.buffer += header_fix.HEADER
+		self._flush()
 	
 	def no_generar(self):
 		self.ejecutable.close()
@@ -27,5 +32,6 @@ class GeneradorLinux(object):
 		return GeneradorNulo()
 	
 	def finalizar(self):
+		self._flush()
 		self.ejecutable.close()
 
