@@ -16,7 +16,10 @@ class GeneradorLinux(object):
 		self.ruta = ruta_ejec
 		self.ejecutable = open(ruta_ejec, "w")
 		self.buffer = ""
+		self.traduce = lambda x,y: x + chr(y)
 		self._agregar_header()
+		self._edi_inicial()
+		
 	
 	def _flush(self):
 		self.ejecutable.write(self.buffer)
@@ -24,7 +27,9 @@ class GeneradorLinux(object):
 	
 	def _agregar_header(self):
 		self.buffer += header_fix.HEADER
-		self._flush()
+	
+	def _edi_inicial(self):
+		self.buffer += reduce(self.traduce ,[0xbf, 0x0, 0x0,0x0, 0x0], "")
 	
 	def no_generar(self):
 		self.ejecutable.close()
@@ -34,4 +39,7 @@ class GeneradorLinux(object):
 	def finalizar(self):
 		self._flush()
 		self.ejecutable.close()
+		
+	def __str__(self):
+		return self.buffer
 
