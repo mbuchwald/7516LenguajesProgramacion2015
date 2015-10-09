@@ -20,3 +20,5 @@ HEADER = reduce(lambda x,y: x + chr(y), bytes, "")
 
 #comando: objdump -M intel -D | less
 
+
+#VOY A PONER COMENTARIOS
