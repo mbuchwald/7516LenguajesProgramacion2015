@@ -11,12 +11,17 @@ class GeneradorNulo(object):
 	def finalizar(self):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
 
+
+EDI_INICIAL = [0xbf, 0x0, 0x0,0x0, 0x0]
+
+def traduce(hexas):
+	reduce(lambda x,y: x + chr(y) ,hexas, "")
+
 class GeneradorLinux(object):
 	def __init__(self, ruta_ejec):
 		self.ruta = ruta_ejec
 		self.ejecutable = open(ruta_ejec, "w")
 		self.buffer = ""
-		self.traduce = lambda x,y: x + chr(y)
 		self._agregar_header()
 		self._edi_inicial()
 		
@@ -29,7 +34,7 @@ class GeneradorLinux(object):
 		self.buffer += header_fix.HEADER
 	
 	def _edi_inicial(self):
-		self.buffer += reduce(self.traduce ,[0xbf, 0x0, 0x0,0x0, 0x0], "")
+		self.buffer += traduce(EDI_INICIAL)
 	
 	def no_generar(self):
 		self.ejecutable.close()
