@@ -15,7 +15,7 @@ class GeneradorNulo(object):
 EDI_INICIAL = [0xbf, 0x0, 0x0,0x0, 0x0]
 
 def traduce(hexas):
-	reduce(lambda x,y: x + chr(y) ,hexas, "")
+	return reduce(lambda x,y: x + chr(y) ,hexas, "")
 
 class GeneradorLinux(object):
 	def __init__(self, ruta_ejec):
