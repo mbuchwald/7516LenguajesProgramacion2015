@@ -323,7 +323,7 @@ class AnalizadorSintactico(object):
 			if self.semantico.obtener_tipo(identificador, base, desplazamiento) == AnalizadorSemantico.CONSTANTE:
 				self.generador.factor_numero(self.semantico.obtener_valor(identificador, base, desplazamiento))
 			else: #Variable
-				pass
+				self.generador.factor_variable(self.semantico.obtener_valor(identificador, base, desplazamiento))
 			simbolo = self.scanner.obtener_simbolo()			
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
 			simbolo = self.scanner.obtener_simbolo()

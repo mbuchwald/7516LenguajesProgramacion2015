@@ -10,6 +10,9 @@ class GeneradorNulo(object):
 		
 	def factor_numero(self, valor):
 		pass
+		
+	def factor_variable(self, num_var):
+		pass
 	
 	def finalizar(self):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
@@ -17,7 +20,8 @@ class GeneradorNulo(object):
 
 EDI_INICIAL = [0xbf, 0x0, 0x0,0x0, 0x0]
 PUSH_EAX = 0x50
-MOV_EAX_CONS = 0xb8
+MOV_EAX_CONS = [0xb8]
+MOV_EAX_VAR = [0x8B, 0x87]
 
 def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
@@ -56,12 +60,19 @@ class GeneradorLinux(object):
 	def finalizar(self):
 		self._flush()
 		self.ejecutable.close()
-		
+	
+	def _push_eax(self):
+		self.buffer += chr(PUSH_EAX)
+	
 	def factor_numero(self, valor):
 		valor = int(valor)
-		self.buffer += traduce([MOV_EAX_CONS] + endian(valor))
-		self.buffer += chr(PUSH_EAX)
-		
+		self.buffer += traduce(MOV_EAX_CONS + endian(valor))
+		self._push_eax()
+	
+	def factor_variable(self, num_var):
+		self.buffer += traduce(MOV_EAX_VAR + endian(num_var))
+		self._push_eax()
+	
 	def __str__(self):
 		return self.buffer
 
