@@ -19,6 +19,3 @@ bytes = [127, 69, 76, 70, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 1, 0, 
 HEADER = reduce(lambda x,y: x + chr(y), bytes, "")
 
 #comando: objdump -M intel -D | less
-
-#Otro Comentario
-#VOY A PONER COMENTARIOS
