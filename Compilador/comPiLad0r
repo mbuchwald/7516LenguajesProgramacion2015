@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import AnalizadorLexico as lexico
 import AnalizadorSemantico as semantico
