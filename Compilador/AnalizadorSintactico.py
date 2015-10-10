@@ -36,12 +36,7 @@ class AnalizadorSintactico(object):
 					identificador = self.scanner.obtener_valor_actual()
 					if self.scanner.identificador_largo():
 						self.generador = self.generador.no_generar()
-					try:
-						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.CONSTANTE)
-						desplazamiento += 1
-					except:
-						self.generador = self.generador.no_generar()
-				
+									
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo != AnalizadorLexico.IGUAL:
 						self.out.write("Error Sintactico: asignacion de constante esperada (=)\n")
@@ -52,13 +47,16 @@ class AnalizadorSintactico(object):
 					if simbolo == AnalizadorLexico.NUMERO:
 						if self.scanner.numero_largo():
 							self.generador = self.generador.no_generar()
-							
-						valor = self.scanner.obtener_valor_actual()
-						#TODO: asignarle el valor al identificador
 					else:
 						self.out.write("Error Sintactico: asignacion de constante a un valor no numerico\n")
 						self.generador = self.generador.no_generar()
 						self.scanner.frenar()
+					
+					try:
+						self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.CONSTANTE, self.scanner.obtener_valor_actual())
+						desplazamiento += 1
+					except:
+						self.generador = self.generador.no_generar()
 													
 					simbolo = self.scanner.obtener_simbolo()
 					if simbolo == AnalizadorLexico.PUNTO_Y_COMA:
@@ -314,12 +312,18 @@ class AnalizadorSintactico(object):
 		if simbolo == AnalizadorLexico.NUMERO:
 			if self.scanner.numero_largo():
 				self.generador = self.generador.no_generar()
+			self.generador.factor_numero(self.scanner.obtener_valor_actual())
 			simbolo = self.scanner.obtener_simbolo()
 		elif simbolo == AnalizadorLexico.IDENTIFICADOR:
 			identificador = self.scanner.obtener_valor_actual()
 			if not self.semantico.factor_correcto(identificador, base, desplazamiento):
 				if self.semantico.agregar_comodin(identificador, base, desplazamiento):
 					desplazamiento += 1
+				self.generador = self.generador.no_generar()
+			if self.semantico.obtener_tipo(identificador, base, desplazamiento) == AnalizadorSemantico.CONSTANTE:
+				self.generador.factor_numero(self.semantico.obtener_valor(identificador, base, desplazamiento))
+			else: #Variable
+				pass
 			simbolo = self.scanner.obtener_simbolo()			
 		elif simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
 			simbolo = self.scanner.obtener_simbolo()

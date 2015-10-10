@@ -12,6 +12,7 @@ class AnalizadorSemantico(object):
 	def __init__(self, output):
 		self.out = output
 		self.tabla = []
+		self.cant_variables = 0
 	
 	def _identificador_existente(self, nombre, base, desplazamiento):
 		for i in range(base, base + desplazamiento):
@@ -24,7 +25,11 @@ class AnalizadorSemantico(object):
 			raise ValueError("Base + desplazamiento fuera de rango")
 		if self._identificador_existente(nombre, base, desplazamiento):
 			raise ValueError("Identificador en uso en este ambiente")
-						
+		
+		if tipo == VARIABLE:
+			valor = self.cant_variables
+			self.cant_variables += 1
+		
 		if len(self.tabla) == base + desplazamiento:
 			self.tabla.append((nombre, tipo, valor))
 		else:
@@ -59,6 +64,17 @@ class AnalizadorSemantico(object):
 				return False
 		self.agregar_identificador(base, desplazamiento, nombre, COMODIN)
 		return True
+	
+	def _obtener(self, nombre, base, desplazamiento, elem):
+		for i in range(base + desplazamiento - 1, -1, -1):
+			if self.tabla[i][NOMBRE] == nombre:
+				return self.tabla[i][elem]
+	
+	def obtener_valor(self, nombre, base, desplazamiento):
+		return self._obtener(nombre, base, desplazamiento, VALOR)
+				
+	def obtener_tipo(self, nombre, base, desplazamiento):
+		return self._obtener(nombre, base, desplazamiento, TIPO)
 	
 	def __str__(self):
 		return str(self.tabla)
