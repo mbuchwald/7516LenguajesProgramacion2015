@@ -20,6 +20,15 @@ class GeneradorNulo(object):
 	def dividir(self):
 		pass
 	
+	def negar(self):
+		pass
+	
+	def sumar(self):
+		pass
+	
+	def restar(self):
+		pass
+	
 	def finalizar(self):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
 
@@ -31,7 +40,10 @@ MOV_EAX_VAR = [0x8B, 0x87]
 POP_EAX = 0x58
 POP_EBX = 0x5B
 IMUL_EBX = [0xF7, 0xEB]
-DIVISION = [0x93, 0x99, 0xF7, 0xFB]
+DIVISION = [0x93, 0x99, 0xF7, 0xFB] #93 99?
+NEG_EAX = [0xF7, 0xD8]
+ADD = [0x01, 0xD8]
+SUB = [0x93, 0x29, 0xD8] #no se para que el 93
 
 def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
@@ -89,6 +101,18 @@ class GeneradorLinux(object):
 		
 	def dividir(self):
 		self.buffer += traduce([POP_EAX, POP_EBX] + DIVISION)
+		self._push_eax()
+		
+	def negar(self):
+		self.buffer += traduce([POP_EAX] + NEG_EAX)
+		self._push_eax()
+	
+	def sumar(self):
+		self.buffer += traduce([POP_EAX, POP_EBX] + ADD)
+		self._push_eax()
+	
+	def restar(self):
+		self.buffer += traduce([POP_EAX, POP_EBX] + SUB)
 		self._push_eax()
 		
 	def __str__(self):

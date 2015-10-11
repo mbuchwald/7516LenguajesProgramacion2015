@@ -287,13 +287,27 @@ class AnalizadorSintactico(object):
 		return desplazamiento		
 					
 	def _parsear_expresion(self, base, desplazamiento):
+		operador = None
+		negar = False
 		simbolo = self.scanner.obtener_tipo_actual()
 		if simbolo == AnalizadorLexico.MAS or simbolo == AnalizadorLexico.MENOS:
+			if simbolo == AnalizadorLexico.MENOS:
+				negar = True
 			simbolo = self.scanner.obtener_simbolo()
 		while True:
 			desplazamiento = self._parsear_termino(base, desplazamiento)
+			
+			if negar:
+				negar = False
+				self.generador.negar()
+			if operador == AnalizadorLexico.MAS:
+				self.generador.sumar()
+			elif operador == AnalizadorLexico.MENOS:
+				self.generador.restar()
+			
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.MAS or simbolo == AnalizadorLexico.MENOS:
+				operador = simbolo
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				return desplazamiento
