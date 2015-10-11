@@ -299,10 +299,16 @@ class AnalizadorSintactico(object):
 				return desplazamiento
 				
 	def _parsear_termino(self, base, desplazamiento):
+		operador = None
 		while True:
 			desplazamiento = self._parsear_factor(base, desplazamiento)
+			if operador == AnalizadorLexico.MULTIPLICAR:
+				self.generador.multiplicar()
+			elif operador == AnalizadorLexico.DIVIDIR:
+				self.generador.dividir()
 			simbolo = self.scanner.obtener_tipo_actual()
 			if simbolo == AnalizadorLexico.MULTIPLICAR or simbolo == AnalizadorLexico.DIVIDIR:
+				operador = simbolo
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				return desplazamiento
