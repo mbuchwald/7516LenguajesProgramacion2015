@@ -76,6 +76,9 @@ class AnalizadorSemantico(object):
 	def obtener_tipo(self, nombre, base, desplazamiento):
 		return self._obtener(nombre, base, desplazamiento, TIPO)
 	
+	def obtener_cantidad_variables(self):
+		return self.cant_variables
+	
 	def __str__(self):
 		return str(self.tabla)
 	

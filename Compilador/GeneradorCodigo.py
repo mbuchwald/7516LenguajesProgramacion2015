@@ -29,11 +29,14 @@ class GeneradorNulo(object):
 	def restar(self):
 		pass
 	
-	def finalizar(self):
+	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
 
-
-EDI_INICIAL = [0xbf, 0x0, 0x0,0x0, 0x0]
+BYTES_POR_VARIABLE = 4
+COMPLEMENTO = 2**32 
+POS_RUTINA_SALIDA = 768
+EDI = 0xbf
+EDI_INICIAL = [0x0, 0x0,0x0, 0x0]
 PUSH_EAX = 0x50
 MOV_EAX_CONS = [0xb8]
 MOV_EAX_VAR = [0x8B, 0x87]
@@ -44,6 +47,7 @@ DIVISION = [0x93, 0x99, 0xF7, 0xFB] #93 99?
 NEG_EAX = [0xF7, 0xD8]
 ADD = [0x01, 0xD8]
 SUB = [0x93, 0x29, 0xD8] #no se para que el 93
+JMP = [0xe9]
 
 def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
@@ -54,6 +58,9 @@ def endian(numero):
 	hexa = [hexa[i*2] + hexa[i*2 +1] for i in range(4)]
 	hexa.reverse()
 	return map(lambda x: int(x, 16), hexa)
+	
+def salto(adonde, donde_estoy):
+	return COMPLEMENTO + adonde - donde_estoy
 
 class GeneradorLinux(object):
 	def __init__(self, ruta_ejec):
@@ -72,14 +79,18 @@ class GeneradorLinux(object):
 		self.buffer += header_fix.HEADER
 	
 	def _edi_inicial(self):
-		self.buffer += traduce(EDI_INICIAL)
+		self.pos_edi = len(self.buffer) - 1
+		self.buffer += traduce([EDI] + EDI_INICIAL)
 	
 	def no_generar(self):
 		self.ejecutable.close()
 		os.remove(self.ruta)
 		return GeneradorNulo()
 	
-	def finalizar(self):
+	def finalizar(self, cant_variables):
+		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,(len(self.buffer) + 5))))
+		self.buffer = self.buffer[:self.pos_edi] + traduce([EDI] + endian(header_fix.VIRTUAL_ADDRESS + len(self.buffer))) + self.buffer[self.pos_edi + 5:]
+		self.buffer += traduce([0 for i in range(cant_variables * BYTES_POR_VARIABLE)])
 		self._flush()
 		self.ejecutable.close()
 	
@@ -92,7 +103,7 @@ class GeneradorLinux(object):
 		self._push_eax()
 	
 	def factor_variable(self, num_var):
-		self.buffer += traduce(MOV_EAX_VAR + endian(num_var))
+		self.buffer += traduce(MOV_EAX_VAR + endian(BYTES_POR_VARIABLE * num_var))
 		self._push_eax()
 		
 	def multiplicar(self):
