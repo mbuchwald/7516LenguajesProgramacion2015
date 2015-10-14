@@ -29,6 +29,9 @@ class GeneradorNulo(object):
 	def restar(self):
 		pass
 	
+	def asignar(self, num):
+		pass
+	
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
 
@@ -48,6 +51,7 @@ NEG_EAX = [0xF7, 0xD8]
 ADD = [0x01, 0xD8]
 SUB = [0x93, 0x29, 0xD8] #no se para que el 93
 JMP = [0xe9]
+MOV_VAR = [0x89, 0x87]
 
 def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
@@ -88,8 +92,11 @@ class GeneradorLinux(object):
 		return GeneradorNulo()
 	
 	def finalizar(self, cant_variables):
+		#Pongo jum de salida de prograa
 		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,(len(self.buffer) + 5))))
-		self.buffer = self.buffer[:self.pos_edi] + traduce([EDI] + endian(header_fix.VIRTUAL_ADDRESS + len(self.buffer))) + self.buffer[self.pos_edi + 5:]
+		#Modifico el edi
+		self.buffer = self.buffer[:self.pos_edi + 1] + traduce([EDI] + endian(header_fix.VIRTUAL_ADDRESS + len(self.buffer))) + self.buffer[self.pos_edi + 6:]
+		#agrego los 0s para cada variable
 		self.buffer += traduce([0 for i in range(cant_variables * BYTES_POR_VARIABLE)])
 		self._flush()
 		self.ejecutable.close()
@@ -125,6 +132,10 @@ class GeneradorLinux(object):
 	def restar(self):
 		self.buffer += traduce([POP_EAX, POP_EBX] + SUB)
 		self._push_eax()
+	
+	def asignar(self, numero_var):
+		self.buffer += traduce([POP_EAX] + MOV_VAR + endian(BYTES_POR_VARIABLE * numero_var))
+		
 		
 	def __str__(self):
 		return self.buffer

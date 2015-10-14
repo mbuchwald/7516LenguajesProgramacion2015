@@ -258,6 +258,7 @@ class AnalizadorSintactico(object):
 			if not self.semantico.asignacion_correcta(identificador, base, desplazamiento):
 				if self.semantico.agregar_comodin(identificador, base, desplazamiento):
 					desplazamiento += 1
+				self.generador = self.generador.no_generar()
 			
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.ASIGNACION:
@@ -266,6 +267,8 @@ class AnalizadorSintactico(object):
 				
 			simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_expresion(base, desplazamiento)
+			self.generador.asignar(self.semantico.obtener_valor(identificador, base, desplazamiento))
+			
 		return desplazamiento
 		
 	def _parsear_condicion(self, base, desplazamiento):
