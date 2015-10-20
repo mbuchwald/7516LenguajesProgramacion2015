@@ -153,11 +153,13 @@ class AnalizadorSintactico(object):
 			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN:
 				simbolo = self.scanner.obtener_simbolo()
 				desplazamiento = self._parsear_proposicion(base, desplazamiento)
+				self.generador.corregir_condicion()
 			else:
 				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
 				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
 		elif valor.lower() == WHILE:
+			self.generador.recordar_while()
 			simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_condicion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
@@ -168,6 +170,9 @@ class AnalizadorSintactico(object):
 					self.scanner.frenar()
 			simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_proposicion(base, desplazamiento)
+			self.generador.salto_while()
+			self.generador.corregir_condicion()
+			
 			
 		elif valor.lower() == BEGIN:
 			while True:
@@ -284,9 +289,11 @@ class AnalizadorSintactico(object):
 		if valor == ODD:
 			simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_expresion(base, desplazamiento)
+			self.generador.odd()
 		else:
 			self._parsear_expresion(base, desplazamiento)
 			simbolo = self.scanner.obtener_tipo_actual()
+			comparador = self.scanner.obtener_valor_actual()
 			if simbolo == AnalizadorLexico.IGUAL or simbolo == AnalizadorLexico.MAYOR or simbolo == AnalizadorLexico.MAYOR_IGUAL or simbolo == AnalizadorLexico.MENOR or simbolo == AnalizadorLexico.MENOR_IGUAL or simbolo == AnalizadorLexico.DISTINTO:
 				simbolo = self.scanner.obtener_simbolo()
 				desplazamiento = self._parsear_expresion(base, desplazamiento)
@@ -294,6 +301,7 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba simbolo de comparacion en comparacion\n")
 				self.generador = self.generador.no_generar()
 				desplazamiento = self._parsear_expresion(base, desplazamiento)
+			self.generador.comparar(comparador)
 		return desplazamiento		
 					
 	def _parsear_expresion(self, base, desplazamiento):
