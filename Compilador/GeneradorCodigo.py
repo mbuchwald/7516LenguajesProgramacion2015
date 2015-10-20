@@ -71,6 +71,7 @@ class GeneradorLinux(object):
 		self.ruta = ruta_ejec
 		self.ejecutable = open(ruta_ejec, "w")
 		self.buffer = ""
+		self.stack = []
 		self._agregar_header()
 		self._edi_inicial()
 		
