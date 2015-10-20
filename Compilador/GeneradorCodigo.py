@@ -31,6 +31,12 @@ class GeneradorNulo(object):
 	
 	def asignar(self, num):
 		pass
+		
+	def writeln(self, valor=None):
+		pass
+	
+	def write(self, valor=None):
+		pass
 	
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
@@ -38,10 +44,15 @@ class GeneradorNulo(object):
 BYTES_POR_VARIABLE = 4
 COMPLEMENTO = 2**32 
 POS_RUTINA_SALIDA = 768
+POS_RUTINA_IMPR_NUMEROS = 400
+POS_RUTINA_IMPR_CADENA = 368
+POS_RUTINA_SALTO_LINEA = 384
 EDI = 0xbf
 EDI_INICIAL = [0x0, 0x0,0x0, 0x0]
 PUSH_EAX = 0x50
 MOV_EAX_CONS = [0xb8]
+MOV_ECX_CONS = [0xb9]
+MOV_EDX_CONS = [0xba]
 MOV_EAX_VAR = [0x8B, 0x87]
 POP_EAX = 0x58
 POP_EBX = 0x5B
@@ -136,7 +147,25 @@ class GeneradorLinux(object):
 	
 	def asignar(self, numero_var):
 		self.buffer += traduce([POP_EAX] + MOV_VAR + endian(BYTES_POR_VARIABLE * numero_var))
-		
+	
+	def write(self, valor=None):
+		if valor is None:
+			#Valor desde expresion
+			self.buffer += traduce([POP_EAX] + JMP + endian(salto(POS_RUTINA_IMPR_NUMEROS ,(len(self.buffer) + 5))))
+		else:
+			#Valor desde cadena
+			offset = 20
+			self.buffer += traduce(MOV_ECX_CONS + endian(193 + len(self.buffer) + offset)) #revisar
+			self.buffer += traduce(MOV_EDX_CONS + endian(len(valor))) #bien
+			self.buffer += traduce(JMP + endian(salto(POS_RUTINA_IMPR_CADENA, len(self.buffer) + 5))) #bien
+			self.buffer += traduce(JMP + endian(len(valor) + 1))
+			self.buffer += valor + chr(0) #bien
+			
+	
+	def writeln(self, valor=None):
+		if valor is None or valor != "":
+			self.write(valor)
+		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALTO_LINEA ,(len(self.buffer) + 5))))
 		
 	def __str__(self):
 		return self.buffer

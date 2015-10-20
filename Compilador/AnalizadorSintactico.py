@@ -188,31 +188,37 @@ class AnalizadorSintactico(object):
 					
 		elif valor.lower() == WRITE or valor.lower() == WRITELN:
 			simbolo = self.scanner.obtener_simbolo()
+			operador = valor
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
-				if valor == WRITE:
+				if operador == WRITE:
 					self.out.write("Error Sintactico: Se esperaba un parentesis luego de write \n")
 					self.generador = self.generador.no_generar()
 					self.scanner.frenar()
 				else:
+					self.generador.writeln("")
 					return desplazamiento
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo == AnalizadorLexico.CADENA:
-				#hacemos algo con esto
 				if self.scanner.error_en_cadena():
 					self.generador = self.generador.no_generar()
 				valor = self.scanner.obtener_valor_actual()
+				self.generador.writeln(valor) if operador == WRITELN else self.generador.write(valor)
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				desplazamiento = self._parsear_expresion(base, desplazamiento)
+				self.generador.writeln() if operador == WRITELN else self.generador.write()
+				
 				
 			while self.scanner.obtener_tipo_actual() == AnalizadorLexico.COMA:
 				simbolo = self.scanner.obtener_simbolo()
 				if simbolo == AnalizadorLexico.CADENA:
 					#hacemos algo con esto
 					valor = self.scanner.obtener_valor_actual()
+					self.generador.writeln(valor) if operador == WRITELN else self.generador.write(valor)
 					simbolo = self.scanner.obtener_simbolo()
 				else:
 					desplazamiento = self._parsear_expresion(base, desplazamiento)
+					self.generador.writeln() if operador == WRITELN else self.generador.write()
 				
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un cierre de parentesis luego de write \n")
@@ -234,6 +240,7 @@ class AnalizadorSintactico(object):
 			if not self.semantico.lectura_correcta(identificador, base, desplazamiento):
 				if self.semantico.agregar_comodin(identificador, base, desplazamiento):
 					desplazamiento += 1
+				self.generador = self.generador.no_generar()
 						
 			simbolo = self.scanner.obtener_simbolo()
 			while simbolo == AnalizadorLexico.COMA:
