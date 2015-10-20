@@ -246,14 +246,18 @@ class AnalizadorSintactico(object):
 				if self.semantico.agregar_comodin(identificador, base, desplazamiento):
 					desplazamiento += 1
 				self.generador = self.generador.no_generar()
-						
+			
+			self.generador.readln(self.semantico.obtener_valor(identificador, base, desplazamiento))
+			
 			simbolo = self.scanner.obtener_simbolo()
 			while simbolo == AnalizadorLexico.COMA:
 				simbolo = self.scanner.obtener_simbolo()
+				identificador = self.scanner.obtener_valor_actual()
 				if simbolo != AnalizadorLexico.IDENTIFICADOR:
 					self.out.write("Error Sintactico: Se esperaba identificador dentro de readln \n")
 					self.generador = self.generador.no_generar()
 					self.scanner.frenar()
+				self.generador.readln(self.semantico.obtener_valor(identificador, base, desplazamiento))
 				simbolo = self.scanner.obtener_simbolo()
 			if simbolo != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba cierre de parentesis luego de readln \n")

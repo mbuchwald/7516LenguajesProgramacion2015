@@ -7,6 +7,7 @@ POS_RUTINA_SALIDA = 768
 POS_RUTINA_IMPR_NUMEROS = 400
 POS_RUTINA_IMPR_CADENA = 368
 POS_RUTINA_SALTO_LINEA = 384
+POS_RUTINA_LECTURA = 784
 EDI = 0xbf
 EDI_INICIAL = [0x0, 0x0,0x0, 0x0]
 PUSH_EAX = 0x50
@@ -153,6 +154,10 @@ class GeneradorLinux(object):
 	def salto_while(self):
 		pos_while = self.stack_while.pop()
 		self.buffer += traduce(JMP + endian(salto(pos_while, len(self.buffer) + 5)))
+		
+	def readln(self, numero_var):
+		self.buffer += traduce(CALL + endian(salto(POS_RUTINA_LECTURA ,(len(self.buffer) + 5))))
+		self.buffer += traduce(MOV_VAR + endian(BYTES_POR_VARIABLE * numero_var))
 		
 	def __str__(self):
 		return self.buffer
