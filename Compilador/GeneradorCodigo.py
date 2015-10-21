@@ -172,7 +172,8 @@ class GeneradorLinux(object):
 		pos_bloque = self.stack_bloques.pop()
 		distancia = len(self.buffer) - int(pos_bloque)
 		if distancia == 0:
-			self.buffer = self.buffer[0: pos_bloque - 5] + self.buffer[pos_bloque + 5:]
+			#self.buffer = self.buffer[0: pos_bloque - 5] + self.buffer[pos_bloque + 5:] optimizacion
+			pass
 		else:
 			self.buffer = self.buffer[0: pos_bloque - 4] + traduce(endian(distancia)) + self.buffer[pos_bloque:]
 	
