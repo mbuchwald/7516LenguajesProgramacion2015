@@ -28,6 +28,7 @@ ODD = [0xA8, 0x01, 0x7B, 0x05]
 CMP_EAX_EBX = [0x39, 0xc3]
 COD_CMP = lambda x: [{">": 0x7c, "<": 0x7f, "=": 0x74, ">=": 0x7d, "<=": 0x7e, "<>": 0x75}[x]] + [0x05]
 CALL = [0xe8]
+RETURN = 0xc3
 
 def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
@@ -49,6 +50,7 @@ class GeneradorLinux(object):
 		self.buffer = ""
 		self.stack = []
 		self.stack_while = []
+		self.stack_bloques = []
 		self._agregar_header()
 		self._edi_inicial()
 		
@@ -156,8 +158,29 @@ class GeneradorLinux(object):
 		self.buffer += traduce(JMP + endian(salto(pos_while, len(self.buffer) + 5)))
 		
 	def readln(self, numero_var):
-		self.buffer += traduce(CALL + endian(salto(POS_RUTINA_LECTURA ,(len(self.buffer) + 5))))
+		self.buffer += traduce(CALL + endian(salto(POS_RUTINA_LECTURA ,len(self.buffer) + 5)))
 		self.buffer += traduce(MOV_VAR + endian(BYTES_POR_VARIABLE * numero_var))
+	
+	def call(self, posicion):
+		self.buffer += traduce(CALL + endian(salto(posicion, len(self.buffer) + 5)))
+	
+	def marcar_bloque(self):
+		self.buffer += traduce(JMP + [0x0 for i in range(4)])
+		self.stack_bloques.append(len(self))
+	
+	def corregir_bloque(self):
+		pos_bloque = self.stack_bloques.pop()
+		distancia = len(self.buffer) - int(pos_bloque)
+		if distancia == 0:
+			self.buffer = self.buffer[0: pos_bloque - 5] + self.buffer[pos_bloque + 5:]
+		else:
+			self.buffer = self.buffer[0: pos_bloque - 4] + traduce(endian(distancia)) + self.buffer[pos_bloque:]
+	
+	def agregar_return(self):
+		self.buffer += traduce([RETURN])
+	
+	def __len__(self):
+		return len(self.buffer)
 		
 	def __str__(self):
 		return self.buffer

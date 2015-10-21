@@ -25,6 +25,7 @@ class AnalizadorSintactico(object):
 		self.generador = generador
 	
 	def _parsear_bloque(self, base = 0):
+		self.generador.marcar_bloque()
 		desplazamiento = 0
 		simbolo = self.scanner.obtener_simbolo()
 		valor = self.scanner.obtener_valor_actual()
@@ -106,7 +107,7 @@ class AnalizadorSintactico(object):
 			if self.scanner.identificador_largo():
 				self.generador = self.generador.no_generar()
 			try: 
-				self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.PROCEDIMIENTO)
+				self.semantico.agregar_identificador(base,desplazamiento, identificador, AnalizadorSemantico.PROCEDIMIENTO, len(self.generador))
 				desplazamiento += 1
 			except:
 				self.generador = self.generador.no_generar()
@@ -119,12 +120,14 @@ class AnalizadorSintactico(object):
 				self.scanner.frenar()
 				#continue
 			self._parsear_bloque(base + desplazamiento) 
+			self.generador.agregar_return()
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.PUNTO_Y_COMA:
 				self.out.write("Error Sintactico: Luego de definir un procedimiento se esperaba por punto y coma (;)\n")
 				self.generador = self.generador.no_generar()
 				continue
 			simbolo = self.scanner.obtener_simbolo()
-		
+			
+		self.generador.corregir_bloque()
 		self._parsear_proposicion(base, desplazamiento)
 			
 	def _parsear_proposicion(self, base, desplazamiento):
@@ -144,8 +147,9 @@ class AnalizadorSintactico(object):
 				self.generador = self.generador.no_generar()
 				if self.semantico.agregar_comodin(identificador, base, desplazamiento):
 					desplazamiento += 1
+			self.generador.call(self.semantico.obtener_valor(identificador, base, desplazamiento))
 			simbolo = self.scanner.obtener_simbolo()
-				
+			
 		elif valor.lower() == IF:
 			simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_condicion(base, desplazamiento)
