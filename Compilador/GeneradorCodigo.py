@@ -30,6 +30,11 @@ COD_CMP = lambda x: [{">": 0x7c, "<": 0x7f, "=": 0x74, ">=": 0x7d, "<=": 0x7e, "
 CALL = [0xe8]
 RETURN = 0xc3
 
+POSICION_FILESIZE = 68
+POSICION_MEMORYSIZE = 72
+POSICION_SIZE = 201
+TAM_HEADER = 224
+
 def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
 	
@@ -73,11 +78,17 @@ class GeneradorLinux(object):
 	
 	def finalizar(self, cant_variables):
 		#Pongo jum de salida de prograa
-		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,(len(self.buffer) + 5))))
+		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,len(self.buffer) + 5)))
 		#Modifico el edi
 		self.buffer = self.buffer[:self.pos_edi + 1] + traduce([EDI] + endian(header_fix.VIRTUAL_ADDRESS + len(self.buffer))) + self.buffer[self.pos_edi + 6:]
 		#agrego los 0s para cada variable
 		self.buffer += traduce([0 for i in range(cant_variables * BYTES_POR_VARIABLE)])
+		#Pongo en filesize y memory size el valor del tam del archivo
+		self.buffer = self.buffer[0: POSICION_FILESIZE] + traduce(endian(len(self))) + self.buffer[POSICION_FILESIZE + 4:]
+		self.buffer = self.buffer[0: POSICION_MEMORYSIZE] + traduce(endian(len(self))) + self.buffer[POSICION_MEMORYSIZE + 4:]
+		#Pongo en size el tam de la porcion text
+		self.buffer = self.buffer[0: POSICION_SIZE] + traduce(endian(len(self) - TAM_HEADER)) + self.buffer[POSICION_SIZE + 4:]
+		#guardo
 		self._flush()
 		self.ejecutable.close()
 	
