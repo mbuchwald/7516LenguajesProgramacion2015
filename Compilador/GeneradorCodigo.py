@@ -222,6 +222,6 @@ class GeneradorNulo(object):
 	def marcar_bloque(self): pass
 	def corregir_bloque(self): pass
 	def agregar_return(self): pass
-		
+	def __len__(self): return 0
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
