@@ -140,9 +140,7 @@ class GeneradorLinux(object):
 			self.buffer += traduce(JMP + endian(len(valor) + 1))
 			self.buffer += valor + chr(0)		
 	
-	def writeln(self, valor=None):
-		if valor is None or valor != "":
-			self.write(valor)
+	def writeln(self):
 		self.buffer += traduce(CALL + endian(salto(POS_RUTINA_SALTO_LINEA ,(len(self.buffer) + 5))))
 		
 	def odd(self):

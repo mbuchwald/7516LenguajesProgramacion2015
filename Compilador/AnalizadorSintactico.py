@@ -196,26 +196,26 @@ class AnalizadorSintactico(object):
 					
 					
 		elif valor.lower() == WRITE or valor.lower() == WRITELN:
+			operador = valor.lower()
 			simbolo = self.scanner.obtener_simbolo()
-			operador = valor
 			if simbolo != AnalizadorLexico.ABRIR_PARENTESIS:
 				if operador == WRITE:
 					self.out.write("Error Sintactico: Se esperaba un parentesis luego de write \n")
 					self.generador = self.generador.no_generar()
 					self.scanner.frenar()
 				else:
-					self.generador.writeln("")
+					self.generador.writeln()
 					return desplazamiento
 			simbolo = self.scanner.obtener_simbolo()
 			if simbolo == AnalizadorLexico.CADENA:
 				if self.scanner.error_en_cadena():
 					self.generador = self.generador.no_generar()
 				valor = self.scanner.obtener_valor_actual()
-				self.generador.writeln(valor) if operador == WRITELN else self.generador.write(valor)
+				self.generador.write(valor)
 				simbolo = self.scanner.obtener_simbolo()
 			else:
 				desplazamiento = self._parsear_expresion(base, desplazamiento)
-				self.generador.writeln() if operador == WRITELN else self.generador.write()
+				self.generador.write()
 				
 				
 			while self.scanner.obtener_tipo_actual() == AnalizadorLexico.COMA:
@@ -223,15 +223,16 @@ class AnalizadorSintactico(object):
 				if simbolo == AnalizadorLexico.CADENA:
 					#hacemos algo con esto
 					valor = self.scanner.obtener_valor_actual()
-					self.generador.writeln(valor) if operador == WRITELN else self.generador.write(valor)
+					self.generador.write(valor)
 					simbolo = self.scanner.obtener_simbolo()
 				else:
 					desplazamiento = self._parsear_expresion(base, desplazamiento)
-					self.generador.writeln() if operador == WRITELN else self.generador.write()
+					self.generador.write()
 				
 			if self.scanner.obtener_tipo_actual() != AnalizadorLexico.CERRAR_PARENTESIS:
 				self.out.write("Error Sintactico: Se esperaba un cierre de parentesis luego de write \n")
 				self.generador = self.generador.no_generar()
+			if operador == WRITELN: self.generador.writeln()
 			simbolo = self.scanner.obtener_simbolo()	
 			
 		elif valor.lower() == READLN:
