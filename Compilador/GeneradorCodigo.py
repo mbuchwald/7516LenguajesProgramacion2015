@@ -142,7 +142,8 @@ class GeneradorLinux(object):
 	def write(self, valor=None):
 		if valor is None:
 			#Valor desde expresion
-			self.buffer += traduce([POP_EAX] + CALL + endian(salto(POS_RUTINA_IMPR_NUMEROS,(len(self.buffer) + 6))))
+			self._pop_eax()
+			self.buffer += traduce(CALL + endian(salto(POS_RUTINA_IMPR_NUMEROS,(len(self.buffer) + 5))))
 		else:
 			#Valor desde cadena
 			offset = 20
