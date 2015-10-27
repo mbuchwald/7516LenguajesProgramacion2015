@@ -383,7 +383,8 @@ class AnalizadorSintactico(object):
 				self.generador = self.generador.no_generar()
 				#self.scanner.frenar()
 		else:
-			self.out.write("Error Sintactico: Identificador no esperado\n")
+			valor = self.scanner.obtener_valor_actual()
+			self.out.write("Error Sintactico: Simbolo no esperado: " + valor if valor is not None else simbolo + "\n")
 			self.generador = self.generador.no_generar()
 		return desplazamiento
 			
