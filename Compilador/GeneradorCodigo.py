@@ -198,52 +198,30 @@ class GeneradorLinux(object):
 		return self.buffer
 
 
+
 class GeneradorNulo(object):
-	def __init__(self):
-		pass
-	
-	def no_generar(self):
-		return self
-		
-	def factor_numero(self, valor):
-		pass
-		
-	def factor_variable(self, num_var):
-		pass
-	
-	def multiplicar(self):
-		pass
-	
-	def dividir(self):
-		pass
-	
-	def negar(self):
-		pass
-	
-	def sumar(self):
-		pass
-	
-	def restar(self):
-		pass
-	
-	def asignar(self, num):
-		pass
-		
-	def writeln(self, valor=None):
-		pass
-	
-	def write(self, valor=None):
-		pass
-		
-	def odd(self):
-		pass
-	
-	def comparar(self, cmp): 
-		pass
-		
-	def salto_while(self): pass
+	def __init__(self): pass	
+	def no_generar(self): return self
+	def factor_numero(self, valor): pass 
+	def factor_variable(self, num_var): pass
+	def multiplicar(self): pass
+	def dividir(self): pass
+	def negar(self): pass
+	def sumar(self): pass
+	def restar(self): pass
+	def asignar(self, numero_var): pass
+	def write(self, valor=None): pass
+	def writeln(self, valor=None): pass		
+	def odd(self): pass	
+	def comparar(self, comparador): pass	
+	def corregir_condicion(self): pass	
 	def recordar_while(self): pass
-	def corregir_condicion(self): pass
-	
+	def salto_while(self): pass		
+	def readln(self, numero_var): pass	
+	def call(self, posicion): pass
+	def marcar_bloque(self): pass
+	def corregir_bloque(self): pass
+	def agregar_return(self): pass
+		
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"
