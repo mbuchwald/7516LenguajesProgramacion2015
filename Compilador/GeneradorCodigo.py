@@ -59,7 +59,7 @@ class GeneradorLinux(object):
 		self.stack_bloques = []
 		self._agregar_header()
 		self._edi_inicial()
-		
+	
 	
 	def _flush(self):
 		self.ejecutable.write(self.buffer)
@@ -97,6 +97,9 @@ class GeneradorLinux(object):
 	
 	def _push_eax(self):
 		self.buffer += chr(PUSH_EAX)
+		
+	def _pop_eax(self):
+		self.buffer += chr(POP_EAX)
 	
 	def factor_numero(self, valor):
 		valor = int(valor)
@@ -108,27 +111,33 @@ class GeneradorLinux(object):
 		self._push_eax()
 		
 	def multiplicar(self):
-		self.buffer += traduce([POP_EAX, POP_EBX] + IMUL_EBX)
+		self._pop_eax()
+		self.buffer += traduce([POP_EBX] + IMUL_EBX)
 		self._push_eax()
 		
 	def dividir(self):
-		self.buffer += traduce([POP_EAX, POP_EBX] + DIVISION)
+		self._pop_eax()
+		self.buffer += traduce([POP_EBX] + DIVISION)
 		self._push_eax()
 		
 	def negar(self):
-		self.buffer += traduce([POP_EAX] + NEG_EAX)
+		self._pop_eax()
+		self.buffer += traduce(NEG_EAX)
 		self._push_eax()
 	
 	def sumar(self):
-		self.buffer += traduce([POP_EAX, POP_EBX] + ADD)
+		self._pop_eax()
+		self.buffer += traduce([POP_EBX] + ADD)
 		self._push_eax()
 	
 	def restar(self):
-		self.buffer += traduce([POP_EAX, POP_EBX] + SUB)
+		self._pop_eax()
+		self.buffer += traduce([POP_EBX] + SUB)
 		self._push_eax()
 	
 	def asignar(self, numero_var):
-		self.buffer += traduce([POP_EAX] + MOV_VAR + endian(BYTES_POR_VARIABLE * numero_var))
+		self._pop_eax()
+		self.buffer += traduce(MOV_VAR + endian(BYTES_POR_VARIABLE * numero_var))
 	
 	def write(self, valor=None):
 		if valor is None:
@@ -147,12 +156,14 @@ class GeneradorLinux(object):
 		self.buffer += traduce(CALL + endian(salto(POS_RUTINA_SALTO_LINEA ,(len(self.buffer) + 5))))
 		
 	def odd(self):
-		self.buffer += traduce ([POP_EAX] + ODD)
+		self._pop_eax()
+		self.buffer += traduce (ODD)
 		self.buffer += traduce(JMP + [0x0, 0x0, 0x0, 0x0])
 		self.stack.append(len(self.buffer))
 	
 	def comparar(self, comparador):
-		self.buffer += traduce([POP_EAX, POP_EBX] + CMP_EAX_EBX + COD_CMP(comparador))
+		self._pop_eax()
+		self.buffer += traduce([POP_EBX] + CMP_EAX_EBX + COD_CMP(comparador))
 		self.buffer += traduce(JMP + [0x0, 0x0, 0x0, 0x0])
 		self.stack.append(len(self.buffer))
 	
@@ -184,8 +195,7 @@ class GeneradorLinux(object):
 		pos_bloque = self.stack_bloques.pop()
 		distancia = len(self.buffer) - int(pos_bloque)
 		if distancia == 0:
-			#self.buffer = self.buffer[0: pos_bloque - 5] + self.buffer[pos_bloque + 5:] optimizacion
-			pass
+			self.buffer = self.buffer[0: pos_bloque - 5] + self.buffer[pos_bloque + 5:]
 		else:
 			self.buffer = self.buffer[0: pos_bloque - 4] + traduce(endian(distancia)) + self.buffer[pos_bloque:]
 	
