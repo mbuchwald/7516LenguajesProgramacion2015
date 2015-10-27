@@ -1,4 +1,5 @@
 import os
+import stat
 import header_fix
 
 BYTES_POR_VARIABLE = 4
@@ -91,6 +92,8 @@ class GeneradorLinux(object):
 		#guardo
 		self._flush()
 		self.ejecutable.close()
+		st = os.stat(self.ruta)
+		os.chmod(self.ruta, st.st_mode | stat.S_IEXEC)
 	
 	def _push_eax(self):
 		self.buffer += chr(PUSH_EAX)
