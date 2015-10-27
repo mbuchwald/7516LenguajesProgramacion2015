@@ -99,7 +99,11 @@ class GeneradorLinux(object):
 		self.buffer += chr(PUSH_EAX)
 		
 	def _pop_eax(self):
-		self.buffer += chr(POP_EAX)
+		#Optimizacion de push-pop
+		if ord(self.buffer[-1]) == PUSH_EAX:
+			self.buffer = self.buffer[:-1]
+		else:
+			self.buffer += chr(POP_EAX)
 	
 	def factor_numero(self, valor):
 		valor = int(valor)
@@ -195,6 +199,7 @@ class GeneradorLinux(object):
 	def corregir_bloque(self):
 		pos_bloque = self.stack_bloques.pop()
 		distancia = len(self.buffer) - int(pos_bloque)
+		#optimizacion de saltos de distancia 0
 		if distancia == 0:
 			self.buffer = self.buffer[0: pos_bloque - 5] + self.buffer[pos_bloque + 5:]
 		else:
