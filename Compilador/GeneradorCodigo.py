@@ -63,7 +63,7 @@ class GeneradorLinux(object):
 	
 	def _flush(self):
 		self.ejecutable.write(self.buffer)
-		self.buffer = ""
+		#self.buffer = ""
 	
 	def _agregar_header(self):
 		self.buffer += header_fix.HEADER
@@ -212,7 +212,7 @@ class GeneradorLinux(object):
 		return len(self.buffer)
 		
 	def __str__(self):
-		return self.buffer
+		return reduce(lambda x,y: x + " " + y, map(lambda x: hex(ord(x))[2:], self.buffer), "")
 
 
 
