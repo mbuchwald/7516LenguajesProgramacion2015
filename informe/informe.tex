@@ -11,12 +11,38 @@
 \usepackage{graphicx}
 
 %\usepackage{float}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{orange}{rgb}{1,0.5,0.}
+
+\lstset{frame=tb,
+	language=Python,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{orange},
+	stringstyle=\color{orange},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+\def\verbatim{\tiny\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
 
 % Portada
 \author{Martín Buchwald}
 
 \title{75.16 Lenguajes de Programación\\
-	\textbf{Trabajo Práctico: Compilador de PL0}\\
+	\textbf{Trabajo Práctico: Compilador de PL/0}\\
 	Facultad de Ingeniería, Universidad de Buenos Aires
 	\date{Cuatrimestre II, 2015}
 }
@@ -28,6 +54,126 @@
 \newpage
 \tableofcontents
 \newpage
+
+\section{Objetivo}
+Implementar un compilador de \texttt{PL/0} que encuentre errores y genere código ejecutable según se describe en el apunte de la cátedra.
+
+\section{Descripción del Compilador}
+El compilador fue implementado en Python\cite{python}. Para dicha implementación, se realizaron 5 módulos:
+\begin{itemize}
+\item Analizador Léxico: Se encarga de hacer el análisis léxico, devolviendo tokens a medida que se van pidiendo lecturas del archivo fuente. 
+\item Analizador Sintáctico: Se encarga de hacer el análisis sintáctico. El tipo de compilador implementado es de tipo \textit{guiado por el parser}, por lo que será quien orqueste pidiendo los servicios del analizador sintáctico y semántico. Se basa en el grafo de sintáxis BNF\cite{bnf} (o mejor dicho, el BNF-Extendido) del lenguaje de PL/0.
+\item Analizador Semántico: Se encarga de realizar el análisis semántico del archivo fuente. Almacena los identificadores en una tabla para analizar que los identificadores utilizados existan en el contexto indicado, y se utilicen de forma correcta según su tipo.
+\item Generador de Código: se encarga de transformar las distintas instrucciones en código ejecutable, dependiendo del sistema operativo utilizado.
+\item Compilador (llamado \texttt{comPiLad0r.py}): simplemente ejecuta el código de los demás módulos generando las conexiones entre éstos, y determinando el archivo fuente de origen, y la ruta destino.
+\end{itemize}
+
+En cada uno de los primeros 3 módulos, es importante recalcar que ante el primer error no se generará código\footnote{Se crea un generado de código nulo, que no realiza operaciones, para no tener que llenar de condicionales el código.}, y se marcarán los errores en un archivo de salida, para poder realizar las correcciones correspondientes, tratando de ser dichos mensajes lo más explicativos posible.
+
+\subsection{Modo de ejecución}
+Para poder realizar la compilación, sólo es necesario tener instalado el intérprete de Python (que viene incluido en cualquier distribución de Linux). 
+
+Ejecutar el comando:
+\lstset{language=Bash}
+\begin{lstlisting}
+~$ ./comPiLad0r.py path/to/sourceFile path/to/execFile
+\end{lstlisting}
+En caso de no indicarse ruta (y nombre) del archivo ejecutable, tomará por defecto el nombre \texttt{ejec} (guardándose en el directorio actual).
+
+\section{Programas Correctos}
+\lstset{language=Pascal}
+
+\subsection{BIEN-00}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-00.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-00.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-00.txt}
+
+\subsection{BIEN-01}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-01.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-01.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-01.txt}
+
+\subsection{BIEN-02}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-02.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-02.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-02.txt}
+
+
+\subsection{BIEN-03}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-03.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-03.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-03.txt}
+
+
+\subsection{BIEN-04}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-04.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-04.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-04.txt}
+
+
+\subsection{BIEN-05}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-05.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-05.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-05.txt}
+
+
+\subsection{BIEN-06}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-06.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-06.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-06.txt}
+
+
+\subsection{BIEN-07}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-07.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-07.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-07.txt}
+
+
+\subsection{BIEN-08}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-08.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-08.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-08.txt}
+
+
+\subsection{BIEN-09}
+\subsubsection{Código Fuente}
+\lstinputlisting{./Archivos/BIEN-09.PL0}
+\subsubsection{Contenido Hexadecimal Completo}
+\VerbatimInput{hexa/BIEN-09.txt}
+\subsubsection{Listado Desensamblado de la sección \textit{.text}}
+\VerbatimInput{text/BIEN-09.txt}
+
+\begin{thebibliography}{10}
+\bibitem{python} \texttt{https://www.python.org/}
+\bibitem{bnf} \textbf{BNF}: Backus-Naur Form. \texttt{https://en.wikipedia.org/wiki/Backus\%E2\%80\%93Naur\_Form}
+\end{thebibliography}
 
 
 \end{document}
