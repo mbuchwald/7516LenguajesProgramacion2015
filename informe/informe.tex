@@ -10,7 +10,7 @@
 
 \usepackage{graphicx}
 
-%\usepackage{float}
+\usepackage{float}
 \usepackage{fancyvrb}
 \usepackage{listings}
 \usepackage{color}
@@ -37,6 +37,7 @@
 }
 
 \def\verbatim{\tiny\@verbatim \frenchspacing\@vobeyspaces \@xverbatim}
+\renewcommand\tablename{Tabla}
 
 % Portada
 \author{Martín Buchwald}
@@ -169,6 +170,103 @@ En caso de no indicarse ruta (y nombre) del archivo ejecutable, tomará por defe
 \VerbatimInput{hexa/BIEN-09.txt}
 \subsubsection{Listado Desensamblado de la sección \textit{.text}}
 \VerbatimInput{text/BIEN-09.txt}
+
+\section{Programas Incorrectos}
+\subsection{MAL-00}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-00.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+6. X = Y; 													&  X := Y;\\
+7. Error Sintactico: Esperada asignacion luego de variable	& \\
+\hline
+11. write ('NUM=') readln (Y);								& write ('NUM=');\\ 
+12. Error Sintactico: Se esperaba un END o punto y coma 		& readln (Y);\\
+(;) luego de una proposicion de un Begin						&\\
+\hline
+14. writeln ("NUM*2=",Y*X)									& writeln ('NUM*2=',Y*X)\\
+15. Error Lexico: comillas de cadena incorrecta				& \\
+\hline
+\end{tabular}
+\caption{Errores MAL-00. Primera compilacion.}
+\label{MAL-00-1}
+\end{table}
+
+\subsection{MAL-01}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-01.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+6.RESU = RESU * BASE;										& RESU := RESU * BASE;\\
+7.Error Sintactico: Esperada asignacion luego de variable		&\\
+\hline
+14.READLN(EXPO)												& READLN(EXPO);\\
+15.RESU := 1;												&\\
+16.Error Sintactico: Se esperaba un END o punto y coma (;) 	&\\
+luego de una proposicion de un Begin							& \\
+\hline
+IF EXPO < 0  RESU := 0;										& IF EXPO < 0 THEN RESU := 0;\\
+Error Sintactico: Se esperaba un 'then' luego de la 			&\\
+condicion de un 'if'											& \\
+\hline
+\end{tabular}
+\caption{Errores MAL-01. Primera compilacion.}
+\label{MAL-01-1}
+\end{table}
+
+\subsection{MAL-02}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-02.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+4. var A, B, A;												& var A, B;\\
+5. Error Semantico: Identificador ya declarado				&\\
+10. if Y ( 0 then B := -B;									& if Y $<$ 0 then B := -B;\\
+11. Error Sintactico: Se esperaba simbolo de comparacion en 	&\\
+comparacion													&\\
+12. Error Sintactico: Cierre de parentesis faltante			&\\
+\hline
+13. while B > 0 then											& while B $>$ 0 do\\
+14. Error Sintactico: Se esperaba un 'do' luego de la		&\\
+condicion de un 'while'										&\\
+\hline
+25. readLn X;												& readLn(X);\\
+26. Error Sintactico: Se esperaba un parentesis luego de		& \\
+readln 														& \\
+27. Error Sintactico: Se esperaba cierre de parentesis luego	& \\
+de readln 													& \\
+\hline
+29. MULTIPLICAR;												& call MULTIPLICAR;\\
+30. Error Semantico: Solo pueden utilizarse variables del 	&\\
+lado izquierdo de una asignacion								&\\
+31. Error Sintactico: Esperada asignacion luego de variable	&\\
+writeLn ('X*Y=', Z);											&\\
+Error Sintactico: Simbolo no esperado: writeLn				&\\
+Error Sintactico: Se esperaba un END o punto y coma (;)		&\\
+luego de una proposicion de un Begin							&\\
+\hline	
+\end{tabular}
+\caption{Errores MAL-02. Primera compilacion.}
+\label{MAL-02-1}
+\end{table}
 
 \begin{thebibliography}{10}
 \bibitem{python} \texttt{https://www.python.org/}
