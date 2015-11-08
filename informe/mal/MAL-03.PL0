@@ -1,7 +1,7 @@
-var X, Y, Q, R;
+var DO, X, Y, Q, R;
 
 procedure DIVIDIR;
-var V, W;
+var V W;
 begin
   Q := 0;
   R := X; if R < 0 then R := -R;
@@ -47,4 +47,5 @@ begin
       call OTRO;
       call SALIDA;
     end
-end.
+end
+end
