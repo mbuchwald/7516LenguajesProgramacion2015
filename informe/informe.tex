@@ -177,7 +177,7 @@ En caso de no indicarse ruta (y nombre) del archivo ejecutable, tomará por defe
 \lstinputlisting{./mal/MAL-00.PL0}
 \subsubsection{Errores de Compilacion}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -203,7 +203,7 @@ Mensajes de Error & Corrección\\
 \lstinputlisting{./mal/MAL-01.PL0}
 \subsubsection{Errores de Compilacion}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -220,7 +220,7 @@ Se esperaba punto (.) de finalizacion de programa			&\\
 \label{MAL-01-1}
 \end{table}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -248,7 +248,7 @@ condicion de un 'if'											& \\
 \lstinputlisting{./mal/MAL-02.PL0}
 \subsubsection{Errores de Compilacion}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -290,7 +290,7 @@ luego de una proposicion de un Begin							&\\
 \lstinputlisting{./mal/MAL-03.PL0}
 \subsubsection{Errores de Compilacion}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -318,7 +318,7 @@ de programa													&\\
 \lstinputlisting{./mal/MAL-04.PL0}
 \subsubsection{Errores de Compilacion}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -352,7 +352,7 @@ luego de una proposicion de un Begin							&\\
 \lstinputlisting{./mal/MAL-05.PL0}
 \subsubsection{Errores de Compilacion}
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{|l|l|}
 \hline
@@ -373,6 +373,151 @@ Error Sintactico: Simbolo no esperado: $<>$					&\\
 \label{MAL-05-1}
 \end{table}
 
+
+\subsection{MAL-06}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-06.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+24. DEMASIADOLARGO12345678901234567890123456789012345678901	&\\
+23456789012345678901234567890,								&\\
+25. Error Lexico: Identificador demasiado largo				&\\
+\hline
+189.  WRITELN ('******************************************	&\\
+**********************************************************	&\\
+**********************************************************	&\\
+**********************************************************	&\\
+************************************)						&************')\\
+191. end.													&\\
+192. Error Lexico: Cadena no finalizada antes que finalice	&\\
+el archivo													&\\
+193. ERROR LEXICO											&\\
+194. Error Sintactico: Se esperaba un cierre de parentesis 	&\\
+luego de write 												&\\
+194. Error Sintactico: Se esperaba un END o punto y coma 		&\\
+(;) luego de una proposicion de un Begin						&\\
+195. Error Sintactico: Se esperaba punto (.) de 				&\\
+finalizacion de programa										&\\
+\hline
+\end{tabular}
+\caption{Errores MAL-06. Primera compilacion.}
+\label{MAL-06-1}
+\end{table}
+
+\subsection{MAL-07}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-07.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+1. CONST N 20;												&CONST N = 20;\\
+2. Error Sintactico: asignacion de constante esperada (=)		&\\
+\hline
+6. PROCEDURE TRI\#NGULO;										&PROCEDURE TRIANGULO;\\
+7. VAR A, B;													&VAR A, B;\\
+8. Error Sintactico: Luego de la identificacion de un 		&\\
+procedimiento se esperaba por punto y coma (;)				&\\
+\hline
+17. WRITE ('*')												& WRITE('*');\\
+18. B := B + 1												& B := B + 1\\
+19. Error Sintactico: Se esperaba un END o punto y coma (;) 	&\\
+luego de una proposicion de un Begin							&\\
+\hline
+27. A := 111111111111111111;									&A := 1;\\
+28. Error Lexico: Numero demasiado largo						&\\
+\hline
+32. A := A + TRIANGULO										&\\
+33. Error Semantico: Identificador no encontrado (TRIANGULO)	&\\
+\hline
+\end{tabular}
+\caption{Errores MAL-07. Primera compilacion.}
+\label{MAL-07-1}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+28. A := A + TRIANGULO										&A := A + 1\\
+29. Error Semantico: Solo pueden usarse variables o 			&\\
+constantes en una expresion									&\\
+\hline
+\end{tabular}
+\caption{Errores MAL-07. Segunda compilacion.}
+\label{MAL-05-2}
+\end{table}
+
+
+\subsection{MAL-08}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-08.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+5. write (',')												& wrtite(',');\\
+6. K := K + 1;												& K := K + 1;\\
+7. Error Sintactico: Se esperaba un END o punto y coma (;) 	&\\
+luego de una proposicion de un Begin							&\\
+\hline
+13. write coma;												&write(K);\\
+14. Error Sintactico: Se esperaba un parentesis luego de		&\\
+write 														&\\
+15. Error Semantico: Solo pueden usarse variables o			&\\
+constantes en una expresion									&\\
+16. Error Sintactico: Se esperaba un cierre de parentesis 	&\\
+luego de write 												&\\
+\hline
+17. call K;													& call coma;\\
+18. Error Sintactico: Se esperaba un END o punto y coma (;)	&\\
+luego de una proposicion de un Begin							&\\
+19. Error Semantico: Solo pueden invocarse procedimientos		&\\
+\hline
+28. Error Sintactico: Se esperaba un END o punto y coma (;)	&end.\\
+luego de una proposicion de un Begin							&\\
+29. Error Sintactico: Se esperaba punto (.) de finalizacion	&\\
+ de programa													&\\
+\hline
+\end{tabular}
+\caption{Errores MAL-08. Primera compilacion.}
+\label{MAL-08-1}
+\end{table}
+
+\subsection{MAL-09}
+\subsubsection{Código Fuente}
+\lstinputlisting{./mal/MAL-09.PL0}
+\subsubsection{Errores de Compilacion}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+Mensajes de Error & Corrección\\
+\hline
+2. Error Sintactico: Se esperaba punto (.) de finalizacion	& .\\
+de programa													&\\
+\hline
+\end{tabular}
+\caption{Errores MAL-09. Primera compilacion.}
+\label{MAL-09-1}
+\end{table}
 
 \begin{thebibliography}{10}
 \bibitem{python} \texttt{https://www.python.org/}
