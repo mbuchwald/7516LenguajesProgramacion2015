@@ -40,6 +40,8 @@ def traduce(hexas):
 	return reduce(lambda x,y: x + chr(y) ,hexas, "")
 	
 def endian(numero):
+	if numero < 0:
+		numero = COMPLEMENTO + numero
 	hexa = str(hex(numero))[2:]
 	hexa = reduce(lambda x,y: x+y, ["0" for i in range(8 - len(hexa))], "") + hexa
 	hexa = [hexa[i*2] + hexa[i*2 +1] for i in range(4)]
@@ -78,7 +80,7 @@ class GeneradorLinux(object):
 		return GeneradorNulo()
 	
 	def finalizar(self, cant_variables):
-		#Pongo jum de salida de prograa
+		#Pongo jum de salida de programa
 		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,len(self.buffer) + 5)))
 		#Modifico el edi
 		self.buffer = self.buffer[:self.pos_edi + 1] + traduce([EDI] + endian(header_fix.VIRTUAL_ADDRESS + len(self.buffer))) + self.buffer[self.pos_edi + 6:]
@@ -208,6 +210,10 @@ class GeneradorLinux(object):
 	def agregar_return(self):
 		self.buffer += traduce([RETURN])
 	
+	def agregar_halt(self):
+		#Pongo jum de salida de programa
+		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,len(self.buffer) + 5)))
+	
 	def __len__(self):
 		return len(self.buffer)
 		
@@ -239,6 +245,7 @@ class GeneradorNulo(object):
 	def marcar_bloque(self): pass
 	def corregir_bloque(self): pass
 	def agregar_return(self): pass
+	def agregar_halt(self): pass
 	def __len__(self): return 0
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"

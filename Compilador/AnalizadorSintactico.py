@@ -15,6 +15,7 @@ END = "end"
 WRITE = "write"
 WRITELN = "writeln"
 READLN = "readln"
+HALT = "halt"
 
 class AnalizadorSintactico(object):
 	
@@ -152,8 +153,20 @@ class AnalizadorSintactico(object):
 			
 		elif valor.lower() == IF:
 			simbolo = self.scanner.obtener_simbolo()
+			parentesis = False
+			if simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
+				parentesis = True
+				simbolo = self.scanner.obtener_simbolo()
 			desplazamiento = self._parsear_condicion(base, desplazamiento)
+			
 			simbolo = self.scanner.obtener_tipo_actual()
+			if parentesis:
+				if simbolo == AnalizadorLexico.CERRAR_PARENTESIS:
+					simbolo = self.scanner.obtener_simbolo()
+				else:
+					self.out.write("Error Sintactico: Se esperaba cierre de Parentesis\n")
+					self.generador = self.generador.no_generar()
+			
 			if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == THEN:
 				simbolo = self.scanner.obtener_simbolo()
 				desplazamiento = self._parsear_proposicion(base, desplazamiento)
@@ -268,6 +281,9 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba cierre de parentesis luego de readln \n")
 				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
+			simbolo = self.scanner.obtener_simbolo()
+		elif valor.lower() == HALT:
+			self.generador.agregar_halt()
 			simbolo = self.scanner.obtener_simbolo()
 		else:
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:

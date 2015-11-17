@@ -16,7 +16,7 @@ class AnalizadorSemantico(object):
 	
 	def _identificador_existente(self, nombre, base, desplazamiento):
 		for i in range(base, base + desplazamiento):
-			if self.tabla[i][NOMBRE] == nombre:
+			if self.tabla[i][NOMBRE] == nombre.lower():
 				return True
 		return False
 	
@@ -31,13 +31,13 @@ class AnalizadorSemantico(object):
 			self.cant_variables += 1
 		
 		if len(self.tabla) == base + desplazamiento:
-			self.tabla.append((nombre, tipo, valor))
+			self.tabla.append((nombre.lower(), tipo, valor))
 		else:
-			self.tabla[base + desplazamiento] = (nombre, tipo, valor)
+			self.tabla[base + desplazamiento] = (nombre.lower(), tipo, valor)
 	
 	def _busqueda(self, nombre, base, desplazamiento, tipos_correctos, mensaje_tipo_incorrecto):
 		for i in range(base + desplazamiento - 1, -1, -1):
-			if self.tabla[i][NOMBRE] == nombre:
+			if self.tabla[i][NOMBRE] == nombre.lower():
 				if self.tabla[i][TIPO] in tipos_correctos or self.tabla[i][TIPO] == COMODIN:
 					return True
 				else:
@@ -60,14 +60,14 @@ class AnalizadorSemantico(object):
 		
 	def agregar_comodin(self, nombre, base, desplazamiento):
 		for i in range(base + desplazamiento - 1, -1, -1):
-			if self.tabla[i][NOMBRE] == nombre:
+			if self.tabla[i][NOMBRE] == nombre.lower():
 				return False
 		self.agregar_identificador(base, desplazamiento, nombre, COMODIN)
 		return True
 	
 	def _obtener(self, nombre, base, desplazamiento, elem):
 		for i in range(base + desplazamiento - 1, -1, -1):
-			if self.tabla[i][NOMBRE] == nombre:
+			if self.tabla[i][NOMBRE] == nombre.lower():
 				return self.tabla[i][elem]
 	
 	def obtener_valor(self, nombre, base, desplazamiento):
