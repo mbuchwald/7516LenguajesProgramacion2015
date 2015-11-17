@@ -41,7 +41,7 @@ def traduce(hexas):
 	
 def endian(numero):
 	if numero < 0:
-		numero = COMPLEMENTO + numero
+		numero = COMPLEMENTO + numero - 1
 	hexa = str(hex(numero))[2:]
 	hexa = reduce(lambda x,y: x+y, ["0" for i in range(8 - len(hexa))], "") + hexa
 	hexa = [hexa[i*2] + hexa[i*2 +1] for i in range(4)]
