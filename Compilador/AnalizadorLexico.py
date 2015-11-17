@@ -3,6 +3,7 @@ QUIEBRE = ["#", "\n"]
 VACIO = ""
 COMILLAS = "'"
 COMILLA_ERROR = "\""
+NEGATIVO = "-"
 
 PALABRAS_RESERVADAS = ["if", "const", "var", "procedure", "call", "if", "while", "begin", "then", "do", "odd", "end", "write", "writeln", "readln"]
 
@@ -96,7 +97,7 @@ class AnalizadorLexico(object):
 			return True
 		return False
 	
-	def obtener_simbolo(self):
+	def obtener_simbolo(self, constante = False):
 		if self.freno:
 			self.freno = False
 			return self.tipo
@@ -111,8 +112,8 @@ class AnalizadorLexico(object):
 					self.tipo = RESERVADA if self.valor.lower() in PALABRAS_RESERVADAS else IDENTIFICADOR
 					return self.tipo
 				
-				if c.isdigit():
-					self._obtener_numero(index)
+				if c.isdigit() or (c == NEGATIVO and constante):
+					self._obtener_numero(index, constante)
 					self.tipo = NUMERO
 					return NUMERO
 				
@@ -159,11 +160,13 @@ class AnalizadorLexico(object):
 		self.tipo = EOF
 		return EOF
 	
-	def _obtener_completo(self, index, numero = False):
+	def _obtener_completo(self, index, constante = False, numero = False):
 		formado = ""
 		for i in range(index, len(self.linea_actual)):
 			c = self.linea_actual[i]
-			if c in ANULADOS or c in QUIEBRE or (numero and not c.isdigit()) or (not c.isdigit() and not c.isalpha()): break
+			if c in ANULADOS or c in QUIEBRE: break
+			if numero and not (c.isdigit() or (c == NEGATIVO and constante)): break
+			if not numero and not (c.isdigit() or c.isalpha()): break
 			formado += c
 			index += 1
 		self.valor = formado
@@ -195,8 +198,8 @@ class AnalizadorLexico(object):
 	def _obtener_id_o_reservada(self, index):
 		self._obtener_completo(index, numero=False)
 	
-	def _obtener_numero(self, index):
-		self._obtener_completo(index, numero=True)
+	def _obtener_numero(self, index, constante):
+		self._obtener_completo(index, constante, numero=True)
 				
 	def _obtener_combinaciones(self, index, primero, posibles_segundos):
 		c = self.linea_actual[index]

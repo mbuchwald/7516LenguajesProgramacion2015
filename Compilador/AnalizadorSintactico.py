@@ -44,7 +44,7 @@ class AnalizadorSintactico(object):
 						self.scanner.frenar()
 						self.generador = self.generador.no_generar()
 						
-					simbolo = self.scanner.obtener_simbolo()
+					simbolo = self.scanner.obtener_simbolo(constante = True)
 					if simbolo == AnalizadorLexico.NUMERO:
 						if self.scanner.numero_largo():
 							self.generador = self.generador.no_generar()
