@@ -213,7 +213,14 @@ class GeneradorLinux(object):
 	def agregar_halt(self):
 		#Pongo jum de salida de programa
 		self.buffer += traduce(JMP + endian(salto(POS_RUTINA_SALIDA ,len(self.buffer) + 5)))
-	
+		
+	def incrementar(self, num_var):
+		self.factor_numero(1)
+		self.factor_variable(num_var)
+		self.sumar()
+		self.asignar(num_var)
+
+		
 	def __len__(self):
 		return len(self.buffer)
 		
@@ -246,6 +253,7 @@ class GeneradorNulo(object):
 	def corregir_bloque(self): pass
 	def agregar_return(self): pass
 	def agregar_halt(self): pass
+	def incrementar(self, num_var): pass
 	def __len__(self): return 0
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"

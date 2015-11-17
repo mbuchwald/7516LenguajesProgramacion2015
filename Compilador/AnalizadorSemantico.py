@@ -49,6 +49,9 @@ class AnalizadorSemantico(object):
 	def asignacion_correcta(self, nombre, base, desplazamiento):
 		return self._busqueda(nombre, base, desplazamiento, [VARIABLE], "Solo pueden utilizarse variables del lado izquierdo de una asignacion")
 	
+	def inc_correcto(self, nombre, base, desplazamiento):
+		return self._busqueda(nombre, base, desplazamiento, [VARIABLE], "Solo pueden utilizarse variables dentro de un inc")
+	
 	def invocacion_procedimiento_correcta(self, nombre, base, desplazamiento):
 		return self._busqueda(nombre, base, desplazamiento, [PROCEDIMIENTO], "Solo pueden invocarse procedimientos")
 	

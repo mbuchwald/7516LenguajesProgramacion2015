@@ -16,6 +16,7 @@ WRITE = "write"
 WRITELN = "writeln"
 READLN = "readln"
 HALT = "halt"
+INC = "inc"
 
 class AnalizadorSintactico(object):
 	
@@ -285,6 +286,34 @@ class AnalizadorSintactico(object):
 		elif valor.lower() == HALT:
 			self.generador.agregar_halt()
 			simbolo = self.scanner.obtener_simbolo()
+		elif valor.lower() == INC:
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo == AnalizadorLexico.ABRIR_PARENTESIS:
+				simbolo = self.scanner.obtener_simbolo()
+			else:
+				self.out.write("Error Sintactico: Se esperaba apertura de parentesis luego de un INC\n")
+				self.generador = self.generador.no_generar()
+				
+			if simbolo == AnalizadorLexico.IDENTIFICADOR:
+				identificador = self.scanner.obtener_valor_actual()
+				if not self.semantico.inc_correcto(identificador, base, desplazamiento):
+					if self.semantico.agregar_comodin(identificador, base, desplazamiento):
+						desplazamiento += 1
+					self.generador = self.generador.no_generar()
+				else:
+					self.generador.incrementar(self.semantico.obtener_valor(identificador, base, desplazamiento))
+			else:
+				self.out.write("Error Sintactico: Se esperaba identificador en INC\n")
+				self.generador = self.generador.no_generar()
+				self.scanner.frenar()
+			
+			simbolo = self.scanner.obtener_simbolo()
+			if simbolo == AnalizadorLexico.CERRAR_PARENTESIS:
+				simbolo = self.scanner.obtener_simbolo()
+			else:
+				self.out.write("Error Sintactico: Fin de parentesis luego de un INC\n")
+				self.generador = self.generador.no_generar()
+				
 		else:
 			if simbolo != AnalizadorLexico.IDENTIFICADOR:
 				self.out.write("Error Sintactico: Se esperaba variable en asignacion, se encuentra la palabra reservada: " + self.scanner.obtener_valor_actual() + "\n")
