@@ -41,7 +41,7 @@ def traduce(hexas):
 	
 def endian(numero):
 	if numero < 0:
-		numero = COMPLEMENTO + numero - 1
+		numero = COMPLEMENTO + numero
 	hexa = str(hex(numero))[2:]
 	hexa = reduce(lambda x,y: x+y, ["0" for i in range(8 - len(hexa))], "") + hexa
 	hexa = [hexa[i*2] + hexa[i*2 +1] for i in range(4)]
@@ -58,6 +58,7 @@ class GeneradorLinux(object):
 		self.buffer = ""
 		self.stack = []
 		self.stack_while = []
+		self.stack_repeat = []
 		self.stack_bloques = []
 		self._agregar_header()
 		self._edi_inicial()
@@ -219,7 +220,13 @@ class GeneradorLinux(object):
 		self.factor_variable(num_var)
 		self.sumar()
 		self.asignar(num_var)
-
+	
+	def recordar_repeat(self):
+		self.stack_repeat.append(len(self.buffer))
+		
+	def salto_repeat(self):
+		pos_repeat = self.stack_repeat.pop()
+		self.buffer = self.buffer[:-5] + traduce(JMP + endian(salto(pos_repeat, len(self.buffer))))
 		
 	def __len__(self):
 		return len(self.buffer)
@@ -254,6 +261,9 @@ class GeneradorNulo(object):
 	def agregar_return(self): pass
 	def agregar_halt(self): pass
 	def incrementar(self, num_var): pass
+	def recordar_repeat(self): pass
+	def salto_repeat(self): pass
+	
 	def __len__(self): return 0
 	def finalizar(self, cant_variables):
 		print "No se genero archivo ejecutable por encontrarse al menos un error"

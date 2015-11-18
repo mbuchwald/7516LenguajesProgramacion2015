@@ -17,6 +17,8 @@ WRITELN = "writeln"
 READLN = "readln"
 HALT = "halt"
 INC = "inc"
+REPEAT = "repeat"
+UNTIL = "until"
 
 class AnalizadorSintactico(object):
 	
@@ -176,6 +178,7 @@ class AnalizadorSintactico(object):
 				self.out.write("Error Sintactico: Se esperaba un 'then' luego de la condicion de un 'if'\n")
 				self.generador = self.generador.no_generar()
 				self.scanner.frenar()
+				
 		elif valor.lower() == WHILE:
 			self.generador.recordar_while()
 			simbolo = self.scanner.obtener_simbolo()
@@ -207,8 +210,27 @@ class AnalizadorSintactico(object):
 						break
 					elif simbolo != AnalizadorLexico.COMA:
 						self.scanner.frenar()
+		
+		elif valor.lower() == REPEAT:
+			self.generador.recordar_repeat()
+			while True:
+				simbolo = self.scanner.obtener_simbolo()
+				desplazamiento = self._parsear_proposicion(base, desplazamiento)
+				simbolo = self.scanner.obtener_tipo_actual()
+				if simbolo == AnalizadorLexico.RESERVADA and self.scanner.obtener_valor_actual().lower() == UNTIL:
+					simbolo = self.scanner.obtener_simbolo()
+					break
+				elif simbolo != AnalizadorLexico.PUNTO_Y_COMA:
+					self.out.write("Error Sintactico: Se esperaba un Until o punto y coma (;) luego de una proposicion de un Repeat\n")
+					self.generador = self.generador.no_generar()
 					
-					
+					if simbolo == AnalizadorLexico.ERROR_LEXICO or simbolo == AnalizadorLexico.EOF:
+						break
+					elif simbolo != AnalizadorLexico.COMA:
+						self.scanner.frenar()
+			self._parsear_condicion(base, desplazamiento)
+			self.generador.salto_repeat()
+			
 		elif valor.lower() == WRITE or valor.lower() == WRITELN:
 			operador = valor.lower()
 			simbolo = self.scanner.obtener_simbolo()
